@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import type { NewsArticle } from "../../types";
-import { getArticles } from "../../services/news.service";
+import { getArticle, getArticles } from "../../services/news.service";
 import { GameModal } from "@/components/ui/game-modal";
 import { EmptyState, ErrorState, NewsPageSkeleton } from "@/components/ui";
 import "./news-page.scss";
@@ -26,7 +26,7 @@ function formatArticleDateTime(dateString?: string): string {
 }
 
 function NewsPage({ articles }: NewsPageProps) {
-  const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
+  const [selectedSummary, setSelectedSummary] = useState<NewsArticle | null>(null);
 
   // Tải danh sách bài viết thời gian thực từ Backend API qua React Query (cache 5 phút)
   const {
@@ -43,7 +43,24 @@ function NewsPage({ articles }: NewsPageProps) {
       return res?.articles ?? [];
     },
     initialData: articles && articles.length > 0 ? articles : undefined,
+    // Luôn lấy lại danh sách mới khi vào trang để thấy bài vừa thêm/sửa
+    staleTime: 0,
+    refetchOnMount: "always",
   });
+
+  // Danh sách không kèm nội dung toàn văn → mở bài thì phải tải chi tiết.
+  // staleTime 0 để mỗi lần mở đều lấy nội dung mới nhất sau khi Admin sửa.
+  const articleKey = selectedSummary?.id ?? selectedSummary?.slug;
+  const { data: articleDetail, isFetching: isFetchingDetail } = useQuery({
+    queryKey: ["news-article", articleKey],
+    queryFn: () => getArticle(articleKey as string),
+    enabled: Boolean(articleKey),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+  const selectedArticle: NewsArticle | null = selectedSummary
+    ? { ...selectedSummary, ...(articleDetail ?? {}) }
+    : null;
 
   // Tự động phân cấp hiển thị & xếp bài theo quy tắc:
   // - Cấp 1: Bài lớn nhất ở vị trí chính
@@ -93,11 +110,11 @@ function NewsPage({ articles }: NewsPageProps) {
   }, [articleList]);
 
   const handleOpenArticle = (article: NewsArticle) => {
-    setSelectedArticle(article);
+    setSelectedSummary(article);
   };
 
   const handleCloseArticle = () => {
-    setSelectedArticle(null);
+    setSelectedSummary(null);
   };
 
   return (
@@ -341,7 +358,9 @@ function NewsPage({ articles }: NewsPageProps) {
 
               {/* 5. Nội dung chính bài viết */}
               <div className="article-modal-simple__content">
-                {selectedArticle.content ? (
+                {isFetchingDetail && !articleDetail?.content ? (
+                  <p>Đang tải nội dung bài viết...</p>
+                ) : selectedArticle.content ? (
                   selectedArticle.content.split("\n\n").map((para, i) => (
                     <p key={i}>{para}</p>
                   ))
