@@ -2,7 +2,7 @@ name: Build & Deploy frontend
 
 # Push lên main: build image -> đẩy lên GHCR -> SSH vào server cập nhật container frontend.
 # Cần secrets: SERVER_HOST, SSH_PRIVATE_KEY (tuỳ chọn: SERVER_PORT, SERVER_USER)
-# Cần variable: SITE_URL (vd https://steamaze.com), được ghi vào bản build
+# Tuỳ chọn: variable hoặc secret SITE_URL (mặc định https://steamaze.com), được ghi vào bản build
 
 on:
   push:
@@ -20,13 +20,12 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Domain ghi vào bản build. Lấy từ variable SITE_URL, hoặc secret SITE_URL, không có thì dùng mặc định
+      SITE_URL: ${{ vars.SITE_URL || secrets.SITE_URL || 'https://steamaze.com' }}
     steps:
-      - name: Kiểm tra biến SITE_URL
-        run: |
-          if [ -z "${{ vars.SITE_URL }}" ]; then
-            echo "::error::Chưa khai báo variable SITE_URL (Settings > Secrets and variables > Actions > Variables)"
-            exit 1
-          fi
+      - name: Domain dùng để build
+        run: echo "SITE_URL=$SITE_URL"
 
       - uses: actions/checkout@v4
 
@@ -53,7 +52,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            NEXT_PUBLIC_SITE_URL=${{ vars.SITE_URL }}
+            NEXT_PUBLIC_SITE_URL=${{ env.SITE_URL }}
             BACKEND_INTERNAL_URL=http://backend:8080
           cache-from: type=gha
           cache-to: type=gha,mode=max
