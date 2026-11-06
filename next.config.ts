@@ -3,7 +3,16 @@ import { env } from "./src/config/env";
 
 const site = new URL(env.siteUrl);
 
+// Địa chỉ backend mà máy chủ Next dùng cho rewrite /api. Trong Docker là http://backend:8080.
+// Giá trị này được ghi vào bản build, nên phải đặt lúc build.
+const backendInternalUrl = (process.env.BACKEND_INTERNAL_URL || "http://127.0.0.1:8080").replace(
+  /\/+$/,
+  "",
+);
+
 const nextConfig: NextConfig = {
+  // Tạo .next/standalone để image Docker gọn (không cần node_modules đầy đủ)
+  output: "standalone",
   turbopack: {
     resolveAlias: {
       "@": "./src",
@@ -169,7 +178,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://127.0.0.1:8080/api/:path*",
+        destination: `${backendInternalUrl}/api/:path*`,
       },
     ];
   },
