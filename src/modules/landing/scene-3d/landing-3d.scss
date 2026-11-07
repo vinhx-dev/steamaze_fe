@@ -715,8 +715,9 @@ $gutter: clamp(22px, 7vw, 120px);
       linear-gradient(180deg, rgba($ink, 0.4) 0, rgba($ink, 0) 110px),
       linear-gradient(0deg, rgba($ink, 0.78) 0%, rgba($ink, 0.5) 24%, rgba($ink, 0.1) 42%, rgba($ink, 0) 52%);
 
+    // Chặng cuối chữ nằm trên đỉnh: phủ tối từ trên xuống để chữ trắng vẫn rõ
     &.is-center {
-      background: linear-gradient(0deg, rgba($ink, 0.75) 0%, rgba($ink, 0.4) 30%, rgba($ink, 0.08) 50%, rgba($ink, 0) 60%);
+      background: linear-gradient(180deg, rgba($ink, 0.75) 0%, rgba($ink, 0.4) 30%, rgba($ink, 0.08) 50%, rgba($ink, 0) 60%);
     }
   }
 
@@ -816,6 +817,13 @@ $gutter: clamp(22px, 7vw, 120px);
       width: auto;
       max-width: none;
       margin: 0;
+    }
+
+    // Chặng cuối: đẩy chữ lên sát đỉnh màn hình để khi kéo tiếp,
+    // chân trang trồi lên từ dưới không che mất chữ
+    &--center .stage__text {
+      top: calc(28px + env(safe-area-inset-top, 0px));
+      bottom: auto;
     }
 
     // Logo gọn trên điện thoại đã đặt chung trong brand-logo.scss
