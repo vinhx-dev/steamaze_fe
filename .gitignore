@@ -40,3 +40,5 @@ next-env.d.ts
 
 # env riêng từng máy (production đặt domain thật ở đây)
 .env*.local
+
+.env
