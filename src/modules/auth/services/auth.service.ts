@@ -36,4 +36,14 @@ async function refreshAuth(refreshToken: string) {
   return res.data.data;
 }
 
-export { login, register, getMe, updateProfile, refreshAuth };
+async function loginWithGoogle(credential: string) {
+  const res = await api.post<ApiResponse<AuthResponse>>("/auth/google", { credential });
+  return res.data.data;
+}
+
+async function loginWithFacebook(accessToken: string) {
+  const res = await api.post<ApiResponse<AuthResponse>>("/auth/facebook", { accessToken });
+  return res.data.data;
+}
+
+export { login, register, loginWithGoogle, loginWithFacebook, getMe, updateProfile, refreshAuth };

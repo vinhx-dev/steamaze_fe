@@ -109,10 +109,14 @@ export function CartView() {
       // Cập nhật số xu người dùng ngay lập tức
       updateCoins(res.remainingCoins);
 
-      // Cập nhật query cache ngay lập tức
-      void queryClient.invalidateQueries({ queryKey: ["shop-items"] });
-      void queryClient.invalidateQueries({ queryKey: ["my-orders"] });
-      void queryClient.invalidateQueries({ queryKey: ["inventory"] });
+      // Cập nhật query cache ngay lập tức.
+      // refetchType: "all" để fetch lại CẢ query đang inactive (ví dụ tủ đồ ở
+      // trang khác chưa mount). Nếu chỉ invalidate mặc định, query inactive chỉ
+      // bị đánh dấu "stale" và vì refetchOnMount: false (xem config/query-client.ts)
+      // nó sẽ dùng cache cũ khi chuyển trang -> phải F5 mới thấy đồ vừa mua.
+      void queryClient.invalidateQueries({ queryKey: ["shop-items"], refetchType: "all" });
+      void queryClient.invalidateQueries({ queryKey: ["my-orders"], refetchType: "all" });
+      void queryClient.invalidateQueries({ queryKey: ["inventory"], refetchType: "all" });
 
       toast.success(res.message);
       handleCloseBuyModal();

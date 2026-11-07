@@ -1,6 +1,16 @@
+export { AboutMissionTeam } from "./components/about-mission-team";
 export { AboutSections } from "./components/about-sections";
+export { BenefitsSection } from "./components/benefits-section";
+export { CtaSection } from "./components/cta-section";
+export { GameCardsFan } from "./components/game-cards-fan";
+export { GameScreen } from "./components/game-screen";
+export { GamesShowcase } from "./components/games-showcase";
 export { HeroHeader } from "./components/hero-header";
+export { HowItWorks } from "./components/how-it-works";
 export { LandingFooter } from "./components/landing-footer";
-export { usePageScale } from "./hooks/use-page-scale";
-export { isMobileViewport, getPageScale } from "./hooks/use-page-scale";
+export { Reveal } from "./components/reveal";
+export { RewardsWardrobe } from "./components/rewards-wardrobe";
+export { StatsTestimonials } from "./components/stats-testimonials";
+export { TrustBar } from "./components/trust-bar";
+export { getPageScale, isMobileViewport, usePageScale } from "./hooks/use-page-scale";
 export type { MenuItem } from "./types";

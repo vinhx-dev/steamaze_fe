@@ -80,8 +80,7 @@ body:has(.login-page) {
 
 .login__logo {
   display: block;
-  margin: 0 auto 10px;
-  transform: translateY(-20px);
+  margin: 2px auto 20px;
   text-align: center;
   text-decoration: none;
 }
@@ -562,5 +561,357 @@ body:has(.login-page) {
   .login__switch {
     margin-top: 6px;
     font-size: 11.5px;
+  }
+
+  .login__divider {
+    margin: 6px 0 4px;
+
+    span {
+      font-size: 10.5px;
+      padding: 0 6px;
+    }
+  }
+}
+
+// -------------------------------------------------------------
+// DẢI PHÂN CÁCH "HOẶC" VÀ NÚT GOOGLE
+// -------------------------------------------------------------
+.login__divider {
+  display: flex;
+  align-items: center;
+  margin: 18px 0 14px;
+  text-align: center;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1.5px;
+    background: rgba(90, 56, 36, 0.25);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  span {
+    padding: 0 12px;
+    color: #6a4733;
+    font-family: $font-game;
+    font-size: 13.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 480px) {
+    margin: 14px 0 10px;
+
+    span {
+      font-size: 12px;
+      padding: 0 8px;
+    }
+  }
+}
+
+.login__google-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+// Nút Google: kiểu nút arcade 3D như nút ĐĂNG NHẬP, nhưng nền giấy kem cho khác màu nút chính.
+// Nút Google thật (iframe) nằm trong suốt phủ lên trên nên hiệu ứng dùng :hover / :focus-within của khung ngoài.
+.google-btn {
+  position: relative;
+  width: 100%;
+  min-height: 52px;
+  border: 2px solid $brown-border;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fffaf1 0%, #f1dfc9 55%, #e4c7a8 100%);
+  box-shadow:
+    inset 0 -3px 0 #a87c5c,
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    0 4px 12px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease, opacity 0.2s ease;
+
+  // Vệt bóng phía trên giống nút chính
+  &::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    height: 42%;
+    border-radius: 8px 8px 12px 12px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.1));
+    pointer-events: none;
+  }
+
+  &:hover:not(.is-disabled) {
+    transform: translateY(-2px);
+    filter: brightness(1.04);
+    box-shadow:
+      inset 0 -3px 0 #a87c5c,
+      inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+      0 6px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  // Bấm Tab tới nút Google thật thì hiện viền để biết đang chọn
+  &:focus-within {
+    outline: 3px solid rgba(208, 21, 44, 0.45);
+    outline-offset: 2px;
+  }
+
+  &.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    filter: grayscale(0.5);
+    box-shadow: none;
+
+    .google-btn__gis {
+      pointer-events: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    min-height: 42px;
+    border-radius: 9px;
+  }
+}
+
+.google-btn__face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 16px;
+  pointer-events: none;
+}
+
+.google-btn__logo {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+
+  @media (max-width: 480px) {
+    width: 24px;
+    height: 24px;
+
+    svg {
+      width: 15px;
+      height: 15px;
+    }
+  }
+}
+
+.google-btn__text {
+  color: #4a2c1b;
+  font-family: $font-game;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+
+  @media (max-width: 480px) {
+    font-size: 13px;
+  }
+}
+
+// Nút Google thật: gần như trong suốt (không để 0 hẳn để trình duyệt vẫn cho bấm), kéo giãn phủ kín nút
+.google-btn__gis {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  opacity: 0.01;
+  transform-origin: top left;
+}
+
+// Điện thoại xoay ngang: thấp như nút ĐĂNG NHẬP
+@media (max-height: 520px) and (orientation: landscape), (max-height: 480px) {
+  .google-btn {
+    min-height: 34px;
+    border-radius: 8px;
+  }
+
+  .google-btn__logo {
+    width: 22px;
+    height: 22px;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  .google-btn__text {
+    font-size: 12px;
+  }
+}
+
+// -------------------------------------------------------------
+// NÚT ĐĂNG NHẬP / ĐĂNG KÝ FACEBOOK
+// -------------------------------------------------------------
+.login__facebook-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.facebook-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 2px solid #0d4a9b;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #2884f6 0%, #1877f2 55%, #1263cf 100%);
+  box-shadow:
+    inset 0 -3px 0 #0b3d80,
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+    0 4px 12px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease, opacity 0.2s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    height: 42%;
+    border-radius: 8px 8px 12px 12px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.05));
+    pointer-events: none;
+  }
+
+  &:hover:not(.is-disabled) {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+    box-shadow:
+      inset 0 -3px 0 #0b3d80,
+      inset 0 0 0 1px rgba(255, 255, 255, 0.5),
+      0 6px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active:not(.is-disabled) {
+    transform: translateY(1px);
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.3),
+      0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(24, 119, 242, 0.5);
+    outline-offset: 2px;
+  }
+
+  &.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    filter: grayscale(0.5);
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+.facebook-btn__face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.facebook-btn__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: #ffffff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+
+  @media (max-width: 480px) {
+    width: 24px;
+    height: 24px;
+
+    svg {
+      width: 17px;
+      height: 17px;
+    }
+  }
+}
+
+.facebook-btn__text {
+  color: #ffffff;
+  font-family: $font-game;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  white-space: nowrap;
+
+  @media (max-width: 480px) {
+    font-size: 13px;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape), (max-height: 480px) {
+  .facebook-btn {
+    min-height: 34px;
+    border-radius: 8px;
+  }
+
+  .facebook-btn__logo {
+    width: 22px;
+    height: 22px;
+
+    svg {
+      width: 15px;
+      height: 15px;
+    }
+  }
+
+  .facebook-btn__text {
+    font-size: 12px;
+  }
+}
+
+
+
+// -------------------------------------------------------------
+// HÀNG CHỨA 2 NÚT GOOGLE + FACEBOOK (CHIA ĐÔI, CÙNG HÀNG)
+// -------------------------------------------------------------
+.login__social-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+  margin-top: 2px;
+
+  > .login__google-container,
+  > .login__facebook-container {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  @media (max-width: 480px) {
+    gap: 8px;
   }
 }

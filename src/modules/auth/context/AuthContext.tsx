@@ -13,10 +13,18 @@ import {
   getMe,
   login as loginService,
   register as registerService,
+  loginWithGoogle as loginWithGoogleService,
+  loginWithFacebook as loginWithFacebookService,
   updateProfile,
   refreshAuth,
 } from "@/modules/auth/services/auth.service";
-import type { LoginPayload, RegisterPayload, UpdateProfilePayload, User } from "@/modules/auth/types";
+import type {
+  AuthResponse,
+  LoginPayload,
+  RegisterPayload,
+  UpdateProfilePayload,
+  User,
+} from "@/modules/auth/types";
 import {
   TOKEN_COOKIE,
   REFRESH_TOKEN_COOKIE,
@@ -36,6 +44,8 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   login: (payload: LoginPayload) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
+  loginWithGoogle: (credential: string) => Promise<void>;
+  loginWithFacebook: (accessToken: string) => Promise<void>;
   updateUser: (payload: UpdateProfilePayload) => Promise<void>;
   refreshUser: () => Promise<void>;
   updateCoins: (coins: number) => void;
@@ -148,8 +158,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = useCallback(async (payload: LoginPayload) => {
-    const data = await loginService(payload);
+  const applyAuth = useCallback((data: AuthResponse) => {
     // Token sống 3 tiếng (10800s), Refresh token sống 7 ngày (604800s)
     setCookie(TOKEN_COOKIE, data.token, 10800);
     if (data.refreshToken) {
@@ -165,22 +174,37 @@ function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const register = useCallback(async (payload: RegisterPayload) => {
-    const data = await registerService(payload);
-    // Token sống 3 tiếng (10800s), Refresh token sống 7 ngày (604800s)
-    setCookie(TOKEN_COOKIE, data.token, 10800);
-    if (data.refreshToken) {
-      setCookie(REFRESH_TOKEN_COOKIE, data.refreshToken, 604800);
-    }
-    if (data.user) {
-      try {
-        setCookie(USER_COOKIE, JSON.stringify(data.user), 10800);
-      } catch {}
-    }
-    setToken(data.token);
-    setUser(data.user);
-    setIsLoading(false);
-  }, []);
+  const login = useCallback(
+    async (payload: LoginPayload) => {
+      const data = await loginService(payload);
+      applyAuth(data);
+    },
+    [applyAuth],
+  );
+
+  const register = useCallback(
+    async (payload: RegisterPayload) => {
+      const data = await registerService(payload);
+      applyAuth(data);
+    },
+    [applyAuth],
+  );
+
+  const loginWithGoogle = useCallback(
+    async (credential: string) => {
+      const data = await loginWithGoogleService(credential);
+      applyAuth(data);
+    },
+    [applyAuth],
+  );
+
+  const loginWithFacebook = useCallback(
+    async (accessToken: string) => {
+      const data = await loginWithFacebookService(accessToken);
+      applyAuth(data);
+    },
+    [applyAuth],
+  );
 
   // Cập nhật thông tin tài khoản
   const updateUser = useCallback(
@@ -225,12 +249,14 @@ function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: Boolean(user && token),
       login,
       register,
+      loginWithGoogle,
+      loginWithFacebook,
       updateUser,
       refreshUser,
       updateCoins,
       logout,
     }),
-    [user, token, isLoading, login, register, updateUser, refreshUser, updateCoins, logout],
+    [user, token, isLoading, login, register, loginWithGoogle, loginWithFacebook, updateUser, refreshUser, updateCoins, logout],
   );
 
 

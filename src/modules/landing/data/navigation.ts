@@ -14,6 +14,10 @@ const leftMenuItems: MenuItem[] = [
 
 const rightMenuItems: MenuItem[] = [
   {
+    label: "VÀO CHƠI",
+    href: "/lessons",
+  },
+  {
     label: "FANPAGE",
     href: "/fanpage",
   },

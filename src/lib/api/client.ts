@@ -240,6 +240,7 @@ api.interceptors.response.use(
       !originalRequest._retry &&
       !originalRequest.url?.includes("/auth/refresh") &&
       !originalRequest.url?.includes("/auth/login") &&
+      !originalRequest.url?.includes("/auth/google") &&
       typeof document !== "undefined"
     ) {
       const refreshToken = getCookie(REFRESH_TOKEN_COOKIE);

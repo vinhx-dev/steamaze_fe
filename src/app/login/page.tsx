@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ManOutlined, WomanOutlined } from "@ant-design/icons";
-import { useAuth } from "@/modules/auth";
+import { useAuth, GoogleLoginButton, FacebookLoginButton } from "@/modules/auth";
 import { BrandLogo } from "@/components/ui";
 import type { LoginPayload, RegisterPayload } from "@/modules/auth/types";
 import { loginPageContent } from "./login.const";
@@ -23,7 +22,7 @@ function getNextPath(): string {
 
 function LoginPage() {
   const router = useRouter();
-  const { user, isLoading, login, register } = useAuth();
+  const { user, isLoading, login, register, loginWithGoogle, loginWithFacebook } = useAuth();
   const [mode, setMode] = useState<AuthMode>("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -40,6 +39,32 @@ function LoginPage() {
       window.location.assign(nextPath);
     } else {
       router.push(nextPath);
+    }
+  }
+
+  async function handleGoogleCredential(credential: string) {
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await loginWithGoogle(credential);
+      navigateAfterAuth();
+    } catch (e) {
+      const apiError = e as { response?: { data?: { message?: string } } };
+      setError(apiError.response?.data?.message ?? "Đăng nhập Google thất bại, thử lại sau.");
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleFacebookAccessToken(accessToken: string) {
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await loginWithFacebook(accessToken);
+      navigateAfterAuth();
+    } catch (e) {
+      const apiError = e as { response?: { data?: { message?: string } } };
+      setError(apiError.response?.data?.message ?? "Đăng nhập Facebook thất bại, thử lại sau.");
+      setIsSubmitting(false);
     }
   }
 
@@ -227,6 +252,28 @@ function LoginPage() {
             {isLogin ? loginPageContent.switchAction.register : loginPageContent.switchAction.login}
           </button>
         </p>
+
+        <div className="login__divider">
+          <span>hoặc</span>
+        </div>
+
+        <div className="login__social-row">
+          <div className="login__google-container">
+            <GoogleLoginButton
+              mode={mode}
+              onCredential={handleGoogleCredential}
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <div className="login__facebook-container">
+            <FacebookLoginButton
+              mode={mode}
+              onAccessToken={handleFacebookAccessToken}
+              disabled={isSubmitting}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

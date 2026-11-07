@@ -11,7 +11,7 @@ $hero-panel: rgba(8, 14, 16, 0.96);
   z-index: 2;
   isolation: isolate;
   width: var(--page-design-width, 1920px);
-  height: 720px;
+  height: 820px;
   min-height: 0;
   overflow: visible;
   background: $hero-ink;
@@ -310,45 +310,105 @@ $hero-panel: rgba(8, 14, 16, 0.96);
     display: none;
   }
 
-  &__banner {
+  &__hero-content {
     position: absolute;
     z-index: 4;
     inset: 0;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 0 110px 120px;
     pointer-events: none;
   }
 
+  &__text-block {
+    position: relative;
+    max-width: 860px;
+    padding: 34px 40px;
+    border-radius: 24px;
+    background: rgba(10, 16, 18, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1.5px solid rgba(227, 182, 92, 0.35);
+    box-shadow:
+      0 20px 48px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    pointer-events: auto;
+  }
+
+  &__pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: rgba(227, 182, 92, 0.18);
+    border: 1.5px solid $hero-gold;
+    color: #fff2d9;
+    font-family: $font-game;
+    font-size: 14.5px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  }
+
+  &__heading {
+    margin: 14px 0 12px;
+    color: #fff2d9;
+    font-family: var(--font-zahra, "Times New Roman", serif);
+    font-size: 54px;
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+    text-shadow:
+      0 3px 6px rgba(45, 15, 6, 0.85),
+      0 0 30px rgba(0, 0, 0, 0.7);
+    -webkit-text-stroke: 1px rgba(60, 25, 10, 0.45);
+  }
+
+  &__subtitle {
+    margin: 0 0 24px;
+    color: #f4ede1;
+    font-family: $font-game;
+    font-size: 23px;
+    font-weight: 700;
+    line-height: 1.45;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.65);
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
   &__play-button {
-    position: absolute;
-    z-index: 5;
-    top: calc(100% - 12px);
-    left: 50%;
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 240px;
-    min-height: 72px;
-    padding: 0 40px;
-    border: 4px solid #6b3410;
+    min-width: 260px;
+    min-height: 68px;
+    padding: 0 36px;
+    border: 3.5px solid #6b3410;
     border-radius: 18px;
     background: linear-gradient(180deg, #e2532f 0%, #b6321a 45%, #8a2410 100%);
     box-shadow:
-      inset 0 3px 6px rgba(255, 255, 255, 0.75),
-      inset 0 -8px 14px rgba(74, 12, 4, 0.35),
+      inset 0 3px 6px rgba(255, 255, 255, 0.8),
+      inset 0 -8px 14px rgba(74, 12, 4, 0.4),
       0 8px 0 #64180b,
-      0 18px 28px rgba(0, 0, 0, 0.5);
+      0 16px 28px rgba(0, 0, 0, 0.5);
     color: #fff2d9;
     cursor: pointer;
-    font-family: $font-family;
-    font-size: 1.125rem;
-    font-weight: 700;
+    font-family: $font-game;
+    font-size: 1.15rem;
+    font-weight: 800;
     letter-spacing: 0.06em;
     line-height: 1;
-    pointer-events: auto;
     text-shadow:
-      0 2px 0 rgba(45, 5, 2, 0.62),
+      0 2px 0 rgba(45, 5, 2, 0.65),
       0 1px 2px rgba(0, 0, 0, 0.4);
     text-transform: uppercase;
-    transform: translate(-50%, -50%);
     transition:
       border-color 120ms ease,
       box-shadow 120ms ease,
@@ -358,11 +418,11 @@ $hero-panel: rgba(8, 14, 16, 0.96);
 
     &::before {
       position: absolute;
-      top: 6px;
+      top: 4px;
       right: 6px;
       left: 6px;
-      height: 45%;
-      border-radius: 12px 12px 40px 40px / 12px 12px 60px 60px;
+      height: 42%;
+      border-radius: 14px 14px 40px 40px / 14px 14px 60px 60px;
       background: linear-gradient(
         180deg,
         rgba(255, 255, 255, 0.85) 0%,
@@ -377,38 +437,77 @@ $hero-panel: rgba(8, 14, 16, 0.96);
       z-index: 1;
     }
 
-    &:hover:not(:disabled),
-    &:focus-visible:not(:disabled) {
-    
+    &:hover:not(:disabled) {
+      filter: brightness(1.08);
+      transform: translateY(-2px);
       box-shadow:
-        inset 0 3px 6px rgba(255, 255, 255, 0.75),
+        inset 0 3px 6px rgba(255, 255, 255, 0.9),
         inset 0 -8px 14px rgba(74, 12, 4, 0.35),
-        0 6px 0 #64180b,
-        0 10px 14px rgba(0, 0, 0, 0.25),
-        0 0 14px rgba(226, 83, 47, 0.58);
-      filter: brightness(1.1);
-      transform: translate(-50%, -50%) translateY(2px);
+        0 10px 0 #64180b,
+        0 20px 32px rgba(0, 0, 0, 0.55);
     }
 
     &:active:not(:disabled) {
+      transform: translateY(6px);
       box-shadow:
-        inset 0 3px 6px rgba(255, 255, 255, 0.75),
-        inset 0 -8px 14px rgba(74, 12, 4, 0.35),
-        0 0 0 #64180b,
-        0 2px 6px rgba(0, 0, 0, 0.2);
-      filter: brightness(0.98);
-      transform: translate(-50%, -50%) translateY(8px);
-    }
-
-    &:disabled {
-      cursor: not-allowed;
-      filter: none;
-      opacity: 0.6;
+        inset 0 2px 4px rgba(0, 0, 0, 0.35),
+        0 2px 0 #64180b,
+        0 8px 14px rgba(0, 0, 0, 0.4);
     }
 
     &:focus-visible {
       @include focus-ring;
     }
+  }
+
+  &__secondary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 64px;
+    padding: 0 30px;
+    border: 2.5px solid rgba(255, 242, 217, 0.75);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    color: #fff2d9;
+    font-family: $font-game;
+    font-size: 1.15rem;
+    font-weight: 800;
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    transition:
+      background 150ms ease,
+      border-color 150ms ease,
+      transform 150ms ease,
+      box-shadow 150ms ease;
+
+    &:hover {
+      background: rgba(255, 242, 217, 0.22);
+      border-color: #fff2d9;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    &:active {
+      transform: translateY(2px);
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+
+  &__note {
+    margin: 0;
+    color: rgba(255, 242, 217, 0.92);
+    font-family: $font-game;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
   }
 
   &__visually-hidden {
@@ -604,10 +703,18 @@ $hero-panel: rgba(8, 14, 16, 0.96);
   }
 
   @media (max-width: 768px) {
-    height: 560px;
+    &:not(.hero-header--compact) {
+      height: auto;
+      min-height: 100svh;
+      max-height: 640px;
+    }
+
+    &__background {
+      object-position: center 30%;
+    }
 
     &__fade {
-      height: 140px;
+      height: 160px;
     }
 
     &__nav-inner {
@@ -620,14 +727,53 @@ $hero-panel: rgba(8, 14, 16, 0.96);
       height: auto;
     }
 
-    &__play-button {
-      top: calc(100% - 20px);
-      min-width: 190px;
-      min-height: 58px;
-      padding: 0 22px;
-      border-width: 3px;
-      border-radius: 14px;
+    &__hero-content {
+      padding: 0 16px 28px;
+    }
+
+    &__text-block {
+      max-width: 100%;
+      padding: 20px 16px;
+      border-radius: 18px;
+    }
+
+    &__pill {
+      font-size: 11.5px;
+      padding: 4px 10px;
+    }
+
+    &__heading {
+      font-size: 32px;
+      margin: 8px 0 6px;
+      line-height: 1.2;
+    }
+
+    &__subtitle {
+      font-size: 15px;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    &__actions {
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    &__play-button,
+    &__secondary-button {
+      width: 100%;
+      min-width: 100%;
+      min-height: 52px;
       font-size: 0.95rem;
+      border-radius: 14px;
+      padding: 0 16px;
+    }
+
+    &__note {
+      font-size: 11.5px;
+      text-align: center;
     }
 
     &__mobile-menu-inner {
@@ -651,16 +797,12 @@ $hero-panel: rgba(8, 14, 16, 0.96);
   }
 
   @media (max-width: 480px) {
-    height: 480px;
-
-    &__logo {
-      width: auto;
+    &__heading {
+      font-size: 29px;
     }
 
-    &__play-button {
-      min-width: 168px;
-      min-height: 54px;
-      font-size: 0.875rem;
+    &__subtitle {
+      font-size: 14px;
     }
   }
 

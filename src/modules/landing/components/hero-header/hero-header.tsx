@@ -260,10 +260,12 @@ function HeroHeader({ variant = "hero", showBackButton }: HeroHeaderProps) {
   }, [isMobileMenuOpen, openMenu]);
 
   // Tự động đóng dropdown khi chuyển tuyến đường
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setIsMobileMenuOpen(false);
     setOpenMenu(null);
-  }, [pathname]);
+  }
 
   const handleBack = () => {
     const isInternalReferrer = document.referrer.startsWith(
@@ -404,25 +406,52 @@ function HeroHeader({ variant = "hero", showBackButton }: HeroHeaderProps) {
 
       {!isCompact && (
         <section
-          className="hero-header__banner"
+          className="hero-header__hero-content"
           aria-labelledby="hero-header-title"
         >
-          <button
-            className="hero-header__play-button"
-            type="button"
-            onClick={() => {
-              if (isAuthenticated || user) {
-                router.push("/lessons");
-              } else {
-                router.push("/login?next=/lessons");
-              }
-            }}
-          >
-            <span>Chơi ngay</span>
-          </button>
-          <h1 className="hero-header__visually-hidden" id="hero-header-title">
-            STEAMaze - Cổng Trò Chơi Giáo Dục STEAM &amp; Thí Nghiệm 3D Tương Tác
-          </h1>
+          <div className="hero-header__text-block">
+            <span className="hero-header__pill">
+              🎮 Trò chơi khoa học cho học sinh cấp 2
+            </span>
+            <h1 className="hero-header__heading" id="hero-header-title">
+              Học khoa học bằng chính đôi tay của bạn
+            </h1>
+            <p className="hero-header__subtitle">
+              Lắc đầu, vẫy tay trước camera để điều khiển chú chuột Whisker, giải đố Hoá
+              học, Vật lý, Quang học, qua màn nhận quà và mặc đồ lên nhân vật.
+            </p>
+
+            <div className="hero-header__actions">
+              <button
+                className="hero-header__play-button"
+                type="button"
+                onClick={() => {
+                  if (isAuthenticated || user) {
+                    router.push("/lessons");
+                  } else {
+                    router.push("/login?next=/lessons");
+                  }
+                }}
+              >
+                <span>CHƠI NGAY – MIỄN PHÍ</span>
+              </button>
+
+              <a
+                className="hero-header__secondary-button"
+                href="#tro-choi"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById("tro-choi")?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                Xem trò chơi ▾
+              </a>
+            </div>
+
+            <p className="hero-header__note">
+              ⚡ Đăng nhập 1 chạm bằng Google · Không cần cài đặt · Chơi ngay trên trình duyệt
+            </p>
+          </div>
         </section>
       )}
     </header>

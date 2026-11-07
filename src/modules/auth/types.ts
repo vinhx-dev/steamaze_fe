@@ -17,6 +17,7 @@ interface UserGroupInfo {
 interface User {
   id: string;
   username: string;
+  email?: string | null;
   avatarUrl: string | null;
   inventoryAvatarUrl?: string | null;
   gender?: GenderValue | null;

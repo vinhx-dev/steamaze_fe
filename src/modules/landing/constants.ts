@@ -1,4 +1,4 @@
-const BRAND_NAME = "STEM";
+const BRAND_NAME = "STEAMaze";
 const DESIGN_WIDTH = 1920;
 const MOBILE_MAX_WIDTH = 768;
 

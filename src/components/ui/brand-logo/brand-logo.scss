@@ -12,7 +12,7 @@
     justify-content: center;
     font-family: var(--font-game, "Baloo 2", cursive, system-ui, sans-serif);
     font-weight: 800;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.015em;
     color: #fab74b;
     -webkit-text-stroke: 4.5px #4a2102;
     paint-order: stroke fill;
@@ -29,13 +29,10 @@
 
   &__letter {
     display: inline-block;
-    transform: translateY(var(--y, 0)) rotate(var(--rot, 0deg));
-    transform-origin: center bottom;
-    margin: 0 -1.5px;
+    margin: 0;
 
     &--lower {
       font-size: 1.06em;
-      margin-left: -2px;
     }
   }
 

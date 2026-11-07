@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config";
 import { buildMetadata, buildWebApplication, buildWebSite } from "@/lib/seo";
-import { AboutSections, HeroHeader, LandingFooter } from "@/modules/landing";
-import { PageWrapper } from "./_components/page-wrapper";
+import { LandingPage3D } from "@/modules/landing/scene-3d";
 
 function generateMetadata(): Metadata {
   return buildMetadata(siteConfig.routes.home, siteConfig.seoText.home);
@@ -10,7 +9,7 @@ function generateMetadata(): Metadata {
 
 function HomePage() {
   return (
-    <PageWrapper>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(buildWebSite()) }}
@@ -20,11 +19,9 @@ function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(buildWebApplication()) }}
       />
       <main>
-        <HeroHeader />
-        <AboutSections />
+        <LandingPage3D />
       </main>
-      <LandingFooter />
-    </PageWrapper>
+    </>
   );
 }
 
