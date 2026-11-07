@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { BrandLogo } from "@/components/ui";
 import { useAuth } from "@/modules/auth";
 import { landing3DContent as C } from "../data/content";
@@ -22,23 +23,76 @@ export function OverlaySections({ activeStopIndex, onGoTo }: OverlaySectionsProp
   const year = new Date().getFullYear();
   const on = (i: number) => (activeStopIndex === i ? " is-active" : "");
 
+  // Menu xổ xuống trên điện thoại (máy tính luôn hiện đủ các mục)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+  const closeMenu = () => setIsMenuOpen(false);
+
+  // Đang mở menu: bấm ra ngoài hoặc nhấn Escape thì đóng
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!navRef.current?.contains(event.target as Node)) setIsMenuOpen(false);
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMenuOpen]);
+
   return (
     <div className="stages">
       {/* Thanh điều hướng */}
       <header className="topbar">
-        <nav className="topbar__nav" aria-label="Điều hướng chính">
-          <button type="button" className="topbar__link" onClick={() => onGoTo(1)}>
-            Trò chơi
-          </button>
-          <Link href="/tin-tuc" className="topbar__link">
-            Tin tức
-          </Link>
-          <Link href="/fanpage" className="topbar__link">
-            Fanpage
-          </Link>
+        <nav ref={navRef} className="topbar__nav" aria-label="Điều hướng chính">
+          <div id="topbar-menu" className={`topbar__links${isMenuOpen ? " is-open" : ""}`}>
+            <Link href="/" className="topbar__drawer-brand" aria-label="STEAMaze - Trang chủ" onClick={closeMenu}>
+              <BrandLogo />
+            </Link>
+            <button
+              type="button"
+              className="topbar__link"
+              onClick={() => {
+                closeMenu();
+                onGoTo(1);
+              }}
+            >
+              Trò chơi
+            </button>
+            <Link href="/tin-tuc" className="topbar__link" onClick={closeMenu}>
+              Tin tức
+            </Link>
+            <Link href="/fanpage" className="topbar__link" onClick={closeMenu}>
+              Fanpage
+            </Link>
+          </div>
           <Link href={isAuthenticated ? "/lessons" : "/login?next=/lessons"} className="topbar__login">
             {isAuthenticated ? "Vào học" : "Đăng nhập"}
           </Link>
+          {/* Lớp tối phía sau thanh menu trái, bấm vào để đóng (chỉ có trên điện thoại) */}
+          <div
+            className={`topbar__backdrop${isMenuOpen ? " is-open" : ""}`}
+            aria-hidden="true"
+            onClick={closeMenu}
+          />
+          {/* Nút ba gạch, chỉ hiện trên điện thoại */}
+          <button
+            type="button"
+            className={`topbar__toggle${isMenuOpen ? " is-open" : ""}`}
+            aria-label={isMenuOpen ? "Đóng menu" : "Mở menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="topbar-menu"
+            onClick={() => setIsMenuOpen((open) => !open)}
+          >
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+          </button>
         </nav>
       </header>
 

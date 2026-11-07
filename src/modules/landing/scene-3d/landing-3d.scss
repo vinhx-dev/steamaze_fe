@@ -123,9 +123,64 @@ $gutter: clamp(22px, 7vw, 120px);
   padding: 18px $gutter;
 
   &__nav {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 30px;
+  }
+
+  &__links {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+
+  // Logo đầu thanh menu trái và lớp tối phía sau: chỉ dùng trên điện thoại
+  &__drawer-brand,
+  &__backdrop {
+    display: none;
+  }
+
+  // Nút ba gạch: máy tính ẩn, điện thoại mới hiện (xem phần "Điện thoại")
+  &__toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 42px;
+    height: 42px;
+    padding: 0 10px;
+    border: 1.5px solid rgba(#fff, 0.85);
+    border-radius: 12px;
+    background: rgba($ink, 0.25);
+    cursor: pointer;
+
+    span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      border-radius: 2px;
+      background: #fff;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    // Đang mở: ba gạch thành dấu X
+    &.is-open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    &.is-open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    &.is-open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    &:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
   }
 
   &__link {
@@ -625,68 +680,196 @@ $gutter: clamp(22px, 7vw, 120px);
   .landing-3d__scrim {
     background:
       linear-gradient(180deg, rgba($ink, 0.4) 0, rgba($ink, 0) 110px),
-      linear-gradient(0deg, rgba($ink, 0.82) 0%, rgba($ink, 0.6) 34%, rgba($ink, 0.12) 60%, rgba($ink, 0) 70%);
+      linear-gradient(0deg, rgba($ink, 0.78) 0%, rgba($ink, 0.5) 24%, rgba($ink, 0.1) 42%, rgba($ink, 0) 52%);
 
     &.is-center {
-      background: linear-gradient(0deg, rgba($ink, 0.78) 0%, rgba($ink, 0.45) 45%, rgba($ink, 0.1) 75%);
+      background: linear-gradient(0deg, rgba($ink, 0.75) 0%, rgba($ink, 0.4) 30%, rgba($ink, 0.08) 50%, rgba($ink, 0) 60%);
     }
   }
 
   .topbar {
     padding: 14px 18px;
 
+    &__nav {
+      flex: 1;
+      gap: 10px;
+    }
+
+    // Nút ba gạch nằm góc trái, luôn nổi trên thanh menu để thành nút đóng (X)
+    &__toggle {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      order: -1;
+      margin-right: auto;
+    }
+
+    // Thanh menu trượt ra từ mép trái
+    &__links {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 2;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 4px;
+      width: min(280px, 80vw);
+      padding: 70px 14px 24px;
+      background: $ink;
+      box-shadow: 8px 0 30px rgba($ink, 0.45);
+      overflow-y: auto;
+      transform: translateX(-100%);
+      visibility: hidden;
+      transition: transform 0.25s ease, visibility 0.25s;
+
+      &.is-open {
+        transform: none;
+        visibility: visible;
+      }
+    }
+
+    &__drawer-brand {
+      display: block;
+      margin: 0 0 14px;
+      padding: 0 14px 16px;
+      border-bottom: 1px solid rgba(#fff, 0.12);
+    }
+
+    &__backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      display: block;
+      background: rgba($ink, 0.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s;
+
+      &.is-open {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+
     &__link {
-      display: none;
+      padding: 13px 14px;
+      border-radius: 10px;
+      text-align: left;
+      font-size: 16px;
+
+      &::after {
+        display: none;
+      }
+
+      &:hover,
+      &:focus-visible {
+        background: rgba(#fff, 0.1);
+      }
     }
   }
 
   .stage {
     align-items: flex-end;
-    padding: 90px 22px 104px;
+    padding: 80px 18px 92px;
 
     &__text {
       max-width: none;
     }
 
+    // Logo gọn: viền mỏng, bỏ bóng đổ, chữ sát nhau hơn
     &__brand {
-      margin-bottom: 20px;
+      margin: 0 0 10px;
 
       .brand-logo__wrapper {
-        font-size: 2.6rem;
+        font-size: 1.9rem;
+        letter-spacing: -0.03em;
+        -webkit-text-stroke: 2px #4a2102;
+        text-shadow: 0 2px 0 #4a2102;
+        transform: none;
       }
     }
 
     &__title {
-      font-size: 30px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
+      font-size: 24px;
+      line-height: 1.15;
 
       &--xl {
-        font-size: 36px;
+        font-size: 28px;
       }
     }
 
+    // Đoạn giới thiệu: chữ nhỏ, tối đa 3 dòng để chừa chỗ cho cảnh 3D
     &__lead {
-      font-size: 16px;
-      margin-bottom: 16px;
+      display: -webkit-box;
+      margin-bottom: 12px;
+      font-size: 14.5px;
+      line-height: 1.45;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     &__list {
-      gap: 6px;
-      margin-bottom: 20px;
+      gap: 4px;
+      margin-bottom: 12px;
 
       li {
-        font-size: 15px;
+        font-size: 14px;
       }
     }
 
-    &__actions > * {
-      flex: 1 1 100%;
-      justify-content: center;
+    &__steps {
+      gap: 6px;
+      margin-bottom: 12px;
+
+      li {
+        font-size: 14px;
+      }
+    }
+
+    &__divider {
+      margin: 12px 0;
+    }
+
+    &__note {
+      margin-top: 10px;
+      font-size: 12.5px;
+    }
+
+    // Hai nút nằm cùng một hàng, thấp hơn
+    &__actions {
+      gap: 8px;
+
+      > * {
+        flex: 1 1 0;
+        justify-content: center;
+      }
     }
 
     &__sponsor {
-      margin-top: 22px;
+      margin-top: 14px;
+      padding-top: 10px;
+      font-size: 10.5px;
     }
+  }
+
+  .stage__actions .btn-play,
+  .stage__actions .btn-play--large,
+  .stage__actions .btn-ghost {
+    padding: 12px 14px;
+    font-size: 14.5px;
+    border-radius: 12px;
+  }
+
+  // Logo trong thanh menu trái cũng gọn như trên
+  .topbar__drawer-brand .brand-logo__wrapper {
+    font-size: 1.7rem;
+    letter-spacing: -0.03em;
+    -webkit-text-stroke: 2px #4a2102;
+    text-shadow: 0 2px 0 #4a2102;
+    transform: none;
   }
 
   .scroll-cue,
@@ -712,13 +895,6 @@ $gutter: clamp(22px, 7vw, 120px);
   .stage__list,
   .stage__note {
     display: none;
-  }
-
-  .stage__lead {
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
   }
 }
 
