@@ -1674,3 +1674,29 @@ $page-h-padding: clamp(16px, 2.5vw, 32px);
     gap: 10px;
   }
 }
+
+// -------------------------------------------------------------
+// ĐỒ VẬT BỊ KHOÁ "SẮP RA MẮT"
+// -------------------------------------------------------------
+.cart-shop-card {
+  &--coming-soon {
+    cursor: not-allowed;
+
+    &:hover {
+      transform: none;
+      box-shadow: var(--card-shadow);
+    }
+
+    .cart-shop-card__image {
+      filter: grayscale(0.7);
+    }
+  }
+
+  &__divider-badge--coming-soon &__divider-badge-inner {
+    background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%);
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.45),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.7),
+      inset 0 -2px 0 #4c1d95;
+  }
+}

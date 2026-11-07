@@ -26,6 +26,7 @@ import {
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
+  LockOutlined,
   PictureOutlined,
   PlusOutlined,
   UploadOutlined,
@@ -121,6 +122,7 @@ export function AdminLessonsPanel() {
       name: `Bài học ${lessons.length + 1}`,
       order: lessons.length + 1,
       published: true,
+      comingSoon: false,
       html: "<!doctype html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <title>Bài học</title>\n</head>\n<body>\n  <h1>Nội dung bài học mới</h1>\n</body>\n</html>",
     });
     setIsModalOpen(true);
@@ -137,6 +139,7 @@ export function AdminLessonsPanel() {
         name: lesson.name,
         order: lesson.order,
         published: detail.published ?? true,
+        comingSoon: Boolean(detail.comingSoon),
         html: detail.html || "",
       });
       setIsModalOpen(true);
@@ -182,6 +185,7 @@ export function AdminLessonsPanel() {
         html: values.html ?? "",
         imageUrl: finalImageUrl,
         published: values.published !== false,
+        comingSoon: Boolean(values.comingSoon),
       };
 
       if (editingLesson) {
@@ -210,6 +214,25 @@ export function AdminLessonsPanel() {
       message.error(getErrorMessage(err, "Có lỗi xảy ra khi lưu bài học."));
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Bật / tắt khoá "Sắp ra mắt" ngay trên bảng, không cần mở form sửa
+  const [togglingLessonId, setTogglingLessonId] = useState<string | null>(null);
+  const handleToggleComingSoon = async (lesson: Lesson, comingSoon: boolean) => {
+    setTogglingLessonId(lesson.id);
+    try {
+      await updateLesson(lesson.id, { comingSoon });
+      setLessons((prev) => prev.map((l) => (l.id === lesson.id ? { ...l, comingSoon } : l)));
+      message.success(
+        comingSoon
+          ? `Đã khoá bài học "${lesson.name}" (Sắp ra mắt).`
+          : `Đã mở khoá bài học "${lesson.name}".`
+      );
+    } catch (err) {
+      message.error(getErrorMessage(err, "Không cập nhật được trạng thái khoá."));
+    } finally {
+      setTogglingLessonId(null);
     }
   };
 
@@ -268,6 +291,22 @@ export function AdminLessonsPanel() {
       width: 120,
       render: (published?: boolean) =>
         published === false ? <Tag>Bản nháp</Tag> : <Tag color="green">Đã xuất bản</Tag>,
+    },
+    {
+      title: "Sắp ra mắt",
+      dataIndex: "comingSoon",
+      key: "comingSoon",
+      width: 130,
+      render: (comingSoon: boolean | undefined, record: Lesson) => (
+        <Switch
+          size="small"
+          checked={Boolean(comingSoon)}
+          loading={togglingLessonId === record.id}
+          checkedChildren={<LockOutlined />}
+          unCheckedChildren="Mở"
+          onChange={(checked) => void handleToggleComingSoon(record, checked)}
+        />
+      ),
     },
     {
       title: "Thao tác",
@@ -350,7 +389,7 @@ export function AdminLessonsPanel() {
           showSizeChanger: true,
           showTotal: (total) => `Tổng cộng ${total} bài học`,
         }}
-        scroll={{ x: 750, y: "calc(100vh - 290px)" }}
+        scroll={{ x: 880, y: "calc(100vh - 290px)" }}
         style={{ width: "100%" }}
       />
 
@@ -366,7 +405,7 @@ export function AdminLessonsPanel() {
         destroyOnClose
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 140px 130px", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 140px 110px 130px", gap: 12 }}>
             <Form.Item
               name="name"
               label="Tên bài học"
@@ -385,6 +424,15 @@ export function AdminLessonsPanel() {
 
             <Form.Item name="published" label="Xuất bản" valuePropName="checked">
               <Switch checkedChildren="Hiện" unCheckedChildren="Nháp" />
+            </Form.Item>
+
+            <Form.Item
+              name="comingSoon"
+              label="Khoá bài"
+              valuePropName="checked"
+              tooltip="Bật để khoá bài ở trạng thái Sắp ra mắt: người chơi thấy thẻ bài nhưng chưa vào được."
+            >
+              <Switch checkedChildren="Sắp ra mắt" unCheckedChildren="Mở" />
             </Form.Item>
           </div>
 

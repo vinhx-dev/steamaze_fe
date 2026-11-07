@@ -44,7 +44,7 @@ async function createLesson(roomId: string, payload: LessonPayload) {
   return res.data.data;
 }
 
-async function updateLesson(lessonId: string, payload: LessonPayload) {
+async function updateLesson(lessonId: string, payload: Partial<LessonPayload>) {
   const res = await api.put<ApiResponse<LessonDetail>>(`/lessons/${lessonId}`, payload);
   return res.data.data;
 }

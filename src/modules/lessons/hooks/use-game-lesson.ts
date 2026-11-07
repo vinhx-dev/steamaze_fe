@@ -54,7 +54,9 @@ export function useGameLesson({ lessonId, initialLesson }: UseGameLessonOptions)
         void setCachedGame(fresh);
         return fresh;
       } catch (err) {
-        if (getStatus(err) === 404) {
+        // 404: bài bị xoá / ẩn; 403: bài đang khoá "Sắp ra mắt" -> bỏ bản lưu trên máy
+        const status = getStatus(err);
+        if (status === 404 || status === 403) {
           void removeCachedGame(lessonId);
         }
         throw err;
@@ -74,7 +76,10 @@ export function useGameLesson({ lessonId, initialLesson }: UseGameLessonOptions)
     },
   });
 
-  const isGone = query.isError && getStatus(query.error) === 404;
+  const errorStatus = query.isError ? getStatus(query.error) : undefined;
+  // Bài khoá "Sắp ra mắt" cũng coi như không chơi được: không dùng bản lưu trên máy
+  const isComingSoon = errorStatus === 403;
+  const isGone = errorStatus === 404 || isComingSoon;
   const fresh = query.data ?? null;
   const lesson = fresh ?? (isGone ? null : cached);
 
@@ -87,6 +92,7 @@ export function useGameLesson({ lessonId, initialLesson }: UseGameLessonOptions)
     isLoading,
     isFromCache: !fresh && Boolean(cached),
     isGone,
+    isComingSoon,
     error,
     isFetching: query.isFetching,
     refetch: query.refetch,

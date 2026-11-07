@@ -10,7 +10,7 @@ import { StaticBackdrop } from "./overlay/static-backdrop";
 import "./landing-3d.scss";
 
 export function LandingPage3D() {
-  const { activeStopIndex, pastHero, scrollToStop } = useScrollProgress();
+  const { activeStopIndex, scrollToStop } = useScrollProgress();
   const { canRender3D, userSkipped, toggleSkip3D } = useCanRender3D();
 
   return (
@@ -22,7 +22,7 @@ export function LandingPage3D() {
 
       <OverlaySections activeStopIndex={activeStopIndex} onGoTo={scrollToStop} />
       <ProgressTrail activeIndex={activeStopIndex} onSelectStop={scrollToStop} />
-      <FixedCta visible={pastHero && activeStopIndex < 6} onToggleSkip3D={toggleSkip3D} userSkipped={userSkipped} />
+      <FixedCta visible={activeStopIndex >= 1 && activeStopIndex < 6} onToggleSkip3D={toggleSkip3D} userSkipped={userSkipped} />
     </div>
   );
 }

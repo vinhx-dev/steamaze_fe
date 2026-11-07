@@ -31,6 +31,8 @@ interface Lesson {
   requiredSlots?: string[] | null;
   // false = bản nháp, chỉ admin thấy
   published?: boolean;
+  // true = khoá "Sắp ra mắt": người chơi thấy thẻ nhưng không vào được
+  comingSoon?: boolean;
   createdAt: string;
   updatedAt: string;
   isNew?: boolean;
@@ -56,6 +58,7 @@ interface LessonPayload {
   html?: string;
   order?: number;
   published?: boolean;
+  comingSoon?: boolean;
 }
 
 export type { Room, RoomBasic, RoomPayload, Lesson, LessonDetail, LessonPayload };

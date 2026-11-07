@@ -238,16 +238,40 @@ $gutter: clamp(22px, 7vw, 120px);
   min-height: 100svh;
   padding: 96px $gutter 64px;
 
+  // Khối chữ ghim cố định trên màn hình: cuộn trang không kéo chữ theo.
+  // Chặng cũ mờ dần hẳn rồi chặng mới mới hiện lên (không chồng lên nhau).
+  // Máy tính: giữa màn hình theo chiều dọc. Điện thoại: sát đáy (xem phần "Điện thoại").
   &__text {
-    max-width: 560px;
-    opacity: 0.25;
-    transform: translateY(18px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    position: fixed;
+    // top/bottom 0 + chiều cao vừa nội dung + margin auto = căn giữa theo chiều dọc
+    top: 0;
+    bottom: 0;
+    left: $gutter;
+    width: min(560px, calc(100vw - 2 * #{$gutter}));
+    height: fit-content;
+    max-height: 100vh;
+    margin: auto 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px);
+    pointer-events: none;
+    // Mờ đi: 0.35s, sau đó mới ẩn hẳn
+    transition:
+      opacity 0.35s ease,
+      transform 0.35s ease,
+      visibility 0s linear 0.35s;
   }
 
   &.is-active &__text {
     opacity: 1;
+    visibility: visible;
     transform: none;
+    pointer-events: auto;
+    // Hiện lên sau khi chặng cũ đã mờ hết
+    transition:
+      opacity 0.45s ease 0.35s,
+      transform 0.45s ease 0.35s,
+      visibility 0s linear 0.35s;
   }
 
   &--center {
@@ -255,7 +279,10 @@ $gutter: clamp(22px, 7vw, 120px);
     text-align: center;
 
     .stage__text {
-      max-width: 760px;
+      left: 0;
+      right: 0;
+      width: min(760px, calc(100vw - 2 * #{$gutter}));
+      margin: auto;
     }
 
     .stage__actions {
@@ -457,8 +484,14 @@ $gutter: clamp(22px, 7vw, 120px);
   }
 
   &--compact {
-    padding: 12px 20px;
-    font-size: 15px;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    box-shadow:
+      0 6px 16px rgba(#cf3c1e, 0.32),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
   }
 }
 
@@ -600,17 +633,17 @@ $gutter: clamp(22px, 7vw, 120px);
   }
 }
 
-/* ---------------- Nút nổi ---------------- */
+/* ---------------- Nút nổi (góc trên bên phải, từ chặng 2) ---------------- */
 .fixed-cta {
   position: fixed;
-  right: 64px;
-  bottom: 24px;
+  top: 18px;
+  right: 26px;
   z-index: 6;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(-12px);
   transition: opacity 0.3s ease, transform 0.3s ease;
   pointer-events: none;
 
@@ -625,7 +658,7 @@ $gutter: clamp(22px, 7vw, 120px);
     border: 0;
     background: none;
     color: rgba(#fff, 0.85);
-    font: 700 13px/1 $font;
+    font: 700 12px/1 $font;
     text-decoration: underline;
     text-underline-offset: 4px;
     text-shadow: 0 1px 8px rgba($ink, 0.7);
@@ -771,23 +804,23 @@ $gutter: clamp(22px, 7vw, 120px);
 
   .stage {
     align-items: flex-end;
-    padding: 80px 18px 92px;
+    padding: 80px 18px 24px;
 
-    &__text {
+    // Điện thoại: khối chữ luôn nằm sát đáy màn hình
+    &__text,
+    &--center .stage__text {
+      top: auto;
+      bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+      left: 18px;
+      right: 18px;
+      width: auto;
       max-width: none;
+      margin: 0;
     }
 
-    // Logo gọn: viền mỏng, bỏ bóng đổ, chữ sát nhau hơn
+    // Logo gọn trên điện thoại đã đặt chung trong brand-logo.scss
     &__brand {
       margin: 0 0 10px;
-
-      .brand-logo__wrapper {
-        font-size: 1.9rem;
-        letter-spacing: -0.03em;
-        -webkit-text-stroke: 2px #4a2102;
-        text-shadow: 0 2px 0 #4a2102;
-        transform: none;
-      }
     }
 
     &__title {
@@ -863,13 +896,9 @@ $gutter: clamp(22px, 7vw, 120px);
     border-radius: 12px;
   }
 
-  // Logo trong thanh menu trái cũng gọn như trên
+  // Logo trong thanh menu trái nhỏ hơn một chút (kiểu gọn đặt chung trong brand-logo.scss)
   .topbar__drawer-brand .brand-logo__wrapper {
     font-size: 1.7rem;
-    letter-spacing: -0.03em;
-    -webkit-text-stroke: 2px #4a2102;
-    text-shadow: 0 2px 0 #4a2102;
-    transform: none;
   }
 
   .scroll-cue,
@@ -877,16 +906,10 @@ $gutter: clamp(22px, 7vw, 120px);
     display: none;
   }
 
+  // Điện thoại: nút "Bỏ qua hoạt cảnh" ở góc trên bên phải
   .fixed-cta {
-    left: 16px;
+    top: calc(14px + env(safe-area-inset-top, 0px));
     right: 16px;
-    bottom: 14px;
-    justify-content: space-between;
-
-    .btn-play {
-      flex: 1;
-      justify-content: center;
-    }
   }
 }
 
@@ -914,7 +937,6 @@ $gutter: clamp(22px, 7vw, 120px);
   }
 
   .stage__text {
-    opacity: 1;
     transform: none;
   }
 }

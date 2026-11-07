@@ -9,6 +9,8 @@ import { getLessons, getRoom, preloadAndCacheGame } from "@/modules/lessons";
 import { useInventory, useItemPreload } from "@/modules/inventory";
 import { warmUpFaceModel } from "@/modules/inventory/hooks/useHeadTracking";
 import { EmptyState, ErrorState, GameCardSkeleton } from "@/components/ui";
+import { toast } from "@/components/ui/game-toast";
+import { useAuth } from "@/modules/auth";
 import "./level-lessons.scss";
 
 interface LevelLessonsViewProps {
@@ -61,6 +63,9 @@ export function LevelLessonsView({ roomId }: LevelLessonsViewProps) {
       return updated;
     });
   };
+
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
 
   const inventoryQuery = useInventory();
   useItemPreload(inventoryQuery.inventory?.equipped ?? []);
@@ -170,20 +175,12 @@ export function LevelLessonsView({ roomId }: LevelLessonsViewProps) {
                   : `/lessons/${roomId}/${lesson.id}`;
 
               const isLiked = isLessonLiked(lesson.id);
+              const isComingSoon = Boolean(lesson.comingSoon);
+              // Bài khoá "Sắp ra mắt": người chơi không vào được, admin vẫn vào để kiểm tra
+              const isLocked = isComingSoon && !isAdmin;
 
-              return (
-                <li key={lesson.id} className="level-lessons__item">
-                  <Link
-                    href={targetUrl}
-                    className="news-card ui-game-card"
-                    onMouseEnter={() => void preloadAndCacheGame(lesson.id)}
-                    onTouchStart={() => void preloadAndCacheGame(lesson.id)}
-                    onClick={() => {
-                      void preloadAndCacheGame(lesson.id);
-                      // Vào bài sẽ mở camera: tải sẵn model AI trong lúc chuyển trang
-                      warmUpFaceModel();
-                    }}
-                  >
+              const cardContent = (
+                <>
                     <div className="news-card__thumb">
                       {lesson.imageUrl ? (
                         <Image
@@ -200,6 +197,26 @@ export function LevelLessonsView({ roomId }: LevelLessonsViewProps) {
                         <div className="news-card__placeholder">
                           <span className="news-card__placeholder-icon">📖</span>
                           <span className="news-card__placeholder-text">Chưa có ảnh</span>
+                        </div>
+                      )}
+                      {isComingSoon && (
+                        <div className="news-card__coming-soon" aria-label="Sắp ra mắt">
+                          <span className="news-card__coming-soon-badge">
+                            <svg
+                              className="news-card__coming-soon-icon"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <rect x="4" y="11" width="16" height="10" rx="2" />
+                              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                            </svg>
+                            Sắp ra mắt
+                          </span>
                         </div>
                       )}
                     </div>
@@ -229,7 +246,42 @@ export function LevelLessonsView({ roomId }: LevelLessonsViewProps) {
                         </button>
                       </div>
                     </div>
-                  </Link>
+                </>
+              );
+
+              return (
+                <li key={lesson.id} className="level-lessons__item">
+                  {isLocked ? (
+                    <div
+                      className="news-card ui-game-card news-card--coming-soon"
+                      role="button"
+                      tabIndex={0}
+                      aria-disabled="true"
+                      onClick={() => toast.info("Bài học này sắp ra mắt, bạn quay lại sau nhé!")}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          toast.info("Bài học này sắp ra mắt, bạn quay lại sau nhé!");
+                        }
+                      }}
+                    >
+                      {cardContent}
+                    </div>
+                  ) : (
+                    <Link
+                      href={targetUrl}
+                      className={`news-card ui-game-card ${isComingSoon ? "news-card--coming-soon-admin" : ""}`}
+                      onMouseEnter={() => void preloadAndCacheGame(lesson.id)}
+                      onTouchStart={() => void preloadAndCacheGame(lesson.id)}
+                      onClick={() => {
+                        void preloadAndCacheGame(lesson.id);
+                        // Vào bài sẽ mở camera: tải sẵn model AI trong lúc chuyển trang
+                        warmUpFaceModel();
+                      }}
+                    >
+                      {cardContent}
+                    </Link>
+                  )}
                 </li>
               );
             })}

@@ -63,6 +63,11 @@ export function CartView() {
       return;
     }
 
+    if (item.comingSoon) {
+      toast.info("Vật phẩm này sắp ra mắt, bạn quay lại sau nhé!");
+      return;
+    }
+
     if (!user) {
       toast.info("Vui lòng đăng nhập để thực hiện mua sắm.");
       router.push("/login?next=/gio-hang");
@@ -196,11 +201,13 @@ export function CartView() {
             {items.map((item) => {
               const canAfford = coins >= item.coinPrice;
               const isOwned = Boolean(item.isOwned);
+              // Đồ đã sở hữu thì vẫn hiện "Đã sở hữu", không cần nhãn khoá
+              const isComingSoon = Boolean(item.comingSoon) && !isOwned;
 
               return (
                 <div
                   key={item.id}
-                  className={`cart-shop-card ${item.isSpecial ? "cart-shop-card--special" : ""} ${isOwned ? "cart-shop-card--owned" : ""}`}
+                  className={`cart-shop-card ${item.isSpecial ? "cart-shop-card--special" : ""} ${isOwned ? "cart-shop-card--owned" : ""} ${isComingSoon ? "cart-shop-card--coming-soon" : ""}`}
                   onClick={() => {
                     if (isOwned) {
                       toast.info("Bạn đã sở hữu vật phẩm này rồi, không thể mua lại nữa.");
@@ -212,7 +219,7 @@ export function CartView() {
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
-                      if (!isOwned) handleOpenBuyModal(item);
+                      handleOpenBuyModal(item);
                     }
                   }}
                 >
@@ -255,6 +262,27 @@ export function CartView() {
                     </div>
                   )}
 
+                  {/* Nhãn SẮP RA MẮT: đồ đang khoá, chưa mua được */}
+                  {isComingSoon && (
+                    <div className="cart-shop-card__divider-badge cart-shop-card__divider-badge--coming-soon" aria-label="Sắp ra mắt">
+                      <div className="cart-shop-card__divider-badge-inner">
+                        <svg
+                          className="cart-shop-card__divider-badge-icon"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <rect x="4" y="11" width="16" height="10" rx="2" />
+                          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                        </svg>
+                        <span className="cart-shop-card__divider-badge-text">SẮP RA MẮT</span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Vùng thông tin sản phẩm */}
                   <div className="cart-shop-card__body">
                     <h3 className="cart-shop-card__title" title={item.name}>
@@ -271,15 +299,21 @@ export function CartView() {
 
                         <button
                           type="button"
-                          className={`cart-card-buy-btn ${item.isSpecial ? "cart-card-buy-btn--special" : ""} ${!canAfford ? "cart-card-buy-btn--disabled" : ""}`}
+                          className={`cart-card-buy-btn ${item.isSpecial ? "cart-card-buy-btn--special" : ""} ${!canAfford || isComingSoon ? "cart-card-buy-btn--disabled" : ""}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleOpenBuyModal(item);
                           }}
-                          disabled={!canAfford}
-                          title={!canAfford ? "Bạn không đủ xu" : "Nhấp để đổi vật phẩm này"}
+                          disabled={!canAfford || isComingSoon}
+                          title={
+                            isComingSoon
+                              ? "Vật phẩm sắp ra mắt"
+                              : !canAfford
+                                ? "Bạn không đủ xu"
+                                : "Nhấp để đổi vật phẩm này"
+                          }
                         >
-                          {canAfford ? "Mua Ngay" : "Thiếu Xu"}
+                          {isComingSoon ? "Sắp Ra Mắt" : canAfford ? "Mua Ngay" : "Thiếu Xu"}
                         </button>
                       </div>
                     )}

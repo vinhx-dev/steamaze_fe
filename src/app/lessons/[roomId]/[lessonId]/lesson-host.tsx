@@ -27,6 +27,7 @@ export function LessonHost({ roomId, lessonId, lesson: initialLesson }: LessonHo
     isLoading,
     isFetching,
     isGone,
+    isComingSoon,
     error,
     refetch,
   } = useGameLesson({
@@ -82,9 +83,11 @@ export function LessonHost({ roomId, lessonId, lesson: initialLesson }: LessonHo
           <ErrorState
             error={error}
             message={
-              isGone
-                ? "Bài học này không còn tồn tại hoặc đã bị ẩn."
-                : "Không thể tải nội dung trò chơi. Vui lòng thử lại."
+              isComingSoon
+                ? "Bài học này sắp ra mắt, bạn quay lại sau nhé!"
+                : isGone
+                  ? "Bài học này không còn tồn tại hoặc đã bị ẩn."
+                  : "Không thể tải nội dung trò chơi. Vui lòng thử lại."
             }
             isRetrying={isFetching}
             onRetry={() => void refetch()}

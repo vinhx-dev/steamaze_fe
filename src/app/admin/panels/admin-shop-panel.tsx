@@ -36,6 +36,7 @@ import {
   InboxOutlined,
   UploadOutlined,
   LinkOutlined,
+  LockOutlined,
 } from "@ant-design/icons";
 import { CoinIcon } from "@/components/ui/coin-icon";
 import {
@@ -210,6 +211,7 @@ export function AdminShopPanel() {
       coinPrice: 10,
       isSpecial: false,
       isActive: true,
+      comingSoon: false,
       stock: undefined,
     });
     setIsItemModalOpen(true);
@@ -231,6 +233,7 @@ export function AdminShopPanel() {
       coinPrice: item.coinPrice,
       isSpecial: item.isSpecial,
       isActive: item.isActive,
+      comingSoon: Boolean(item.comingSoon),
       stock: item.stock === null ? undefined : item.stock,
     });
     setIsItemModalOpen(true);
@@ -248,6 +251,7 @@ export function AdminShopPanel() {
         imageUrl: values.imageUrl.trim(),
         coinPrice: Number(values.coinPrice),
         isSpecial: Boolean(values.isSpecial),
+        comingSoon: Boolean(values.comingSoon),
         stock: values.stock === undefined || values.stock === null || values.stock === "" ? null : Number(values.stock),
       };
 
@@ -273,6 +277,25 @@ export function AdminShopPanel() {
       message.error(getErrorMessage(err, "Lưu sản phẩm thất bại."));
     } finally {
       setIsSubmittingItem(false);
+    }
+  };
+
+  // Bật / tắt khoá "Sắp ra mắt" ngay trên bảng
+  const [togglingItemId, setTogglingItemId] = useState<string | null>(null);
+  const handleToggleComingSoon = async (item: ShopItem, comingSoon: boolean) => {
+    setTogglingItemId(item.id);
+    try {
+      const updated = await updateShopItem(item.id, { comingSoon });
+      setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+      message.success(
+        comingSoon
+          ? `Đã khoá "${item.name}" (Sắp ra mắt).`
+          : `Đã mở khoá "${item.name}".`
+      );
+    } catch (err) {
+      message.error(getErrorMessage(err, "Không cập nhật được trạng thái khoá."));
+    } finally {
+      setTogglingItemId(null);
     }
   };
 
@@ -401,6 +424,22 @@ export function AdminShopPanel() {
       width: 120,
       render: (isActive: boolean) =>
         isActive ? <Tag color="green">Đang bán</Tag> : <Tag>Tạm ngưng</Tag>,
+    },
+    {
+      title: "Sắp ra mắt",
+      dataIndex: "comingSoon",
+      key: "comingSoon",
+      width: 130,
+      render: (comingSoon: boolean | undefined, record: ShopItem) => (
+        <Switch
+          size="small"
+          checked={Boolean(comingSoon)}
+          loading={togglingItemId === record.id}
+          checkedChildren={<LockOutlined />}
+          unCheckedChildren="Mở"
+          onChange={(checked) => void handleToggleComingSoon(record, checked)}
+        />
+      ),
     },
     {
       title: "Thao tác",
@@ -624,7 +663,7 @@ export function AdminShopPanel() {
               pageSizeOptions: ["10", "12", "20", "50"],
               showTotal: (total) => `Tổng cộng ${total} sản phẩm`,
             }}
-            scroll={{ x: 950, y: "calc(100vh - 290px)" }}
+            scroll={{ x: 1080, y: "calc(100vh - 290px)" }}
             style={{ width: "100%" }}
           />
         </div>
@@ -1043,6 +1082,15 @@ export function AdminShopPanel() {
             </Form.Item>
           )}
 
+          <Form.Item
+            name="comingSoon"
+            label="Khoá đồ vật"
+            valuePropName="checked"
+            extra="Bật để hiện đồ vật trong cửa hàng với nhãn Sắp ra mắt, người chơi chưa mua được."
+          >
+            <Switch checkedChildren="Sắp ra mắt" unCheckedChildren="Mở bán" />
+          </Form.Item>
+
           <Form.Item name="description" label="Mô tả sản phẩm">
             <Input.TextArea rows={3} placeholder="Mô tả tính năng, quà tặng hoặc hướng dẫn nhận..." />
           </Form.Item>
@@ -1081,6 +1129,7 @@ export function AdminShopPanel() {
                 <Tag color={viewingItem.isActive ? "green" : "default"}>
                   {viewingItem.isActive ? "Đang bán" : "Tạm ngưng"}
                 </Tag>
+                {viewingItem.comingSoon && <Tag color="purple">Sắp ra mắt</Tag>}
               </div>
             </div>
             {viewingItem.description && (

@@ -65,3 +65,21 @@
     }
   }
 }
+
+// -------------------------------------------------------------
+// ĐIỆN THOẠI: logo gọn giống trang chủ, áp dụng cho MỌI nơi dùng logo
+// (viền mỏng, bỏ bóng đổ nhiều lớp, chữ sát nhau hơn, không phóng to)
+// -------------------------------------------------------------
+@media (max-width: 899px) {
+  .brand-logo .brand-logo__wrapper {
+    font-size: 1.9rem;
+    letter-spacing: -0.03em;
+    -webkit-text-stroke: 2px #4a2102;
+    text-shadow: 0 2px 0 #4a2102;
+    transform: none;
+  }
+
+  .brand-logo--sm .brand-logo__wrapper {
+    font-size: 1.6rem;
+  }
+}

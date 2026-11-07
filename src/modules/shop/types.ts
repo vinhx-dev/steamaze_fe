@@ -7,6 +7,8 @@ export interface ShopItem {
   isSpecial: boolean;
   stock: number | null;
   isActive: boolean;
+  // true = khoá "Sắp ra mắt": hiện trong cửa hàng nhưng chưa mua được
+  comingSoon?: boolean;
   isOwned?: boolean;
   createdAt: string;
   updatedAt: string;
@@ -58,6 +60,7 @@ export interface CreateShopItemPayload {
   coinPrice: number;
   isSpecial: boolean;
   stock?: number | null;
+  comingSoon?: boolean;
 }
 
 export interface UpdateShopItemPayload {
@@ -68,6 +71,7 @@ export interface UpdateShopItemPayload {
   isSpecial?: boolean;
   stock?: number | null;
   isActive?: boolean;
+  comingSoon?: boolean;
 }
 
 export interface AdminOrdersResponse {
