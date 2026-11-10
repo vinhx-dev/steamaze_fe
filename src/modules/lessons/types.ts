@@ -33,6 +33,9 @@ interface Lesson {
   published?: boolean;
   // true = khoá "Sắp ra mắt": người chơi thấy thẻ nhưng không vào được
   comingSoon?: boolean;
+  firstPlayCoins?: number;
+  replayCoins?: number;
+  isCompleted?: boolean;
   createdAt: string;
   updatedAt: string;
   isNew?: boolean;
@@ -59,6 +62,8 @@ interface LessonPayload {
   order?: number;
   published?: boolean;
   comingSoon?: boolean;
+  firstPlayCoins?: number;
+  replayCoins?: number;
 }
 
 export type { Room, RoomBasic, RoomPayload, Lesson, LessonDetail, LessonPayload };

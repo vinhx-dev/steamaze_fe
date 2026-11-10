@@ -227,6 +227,24 @@ export function LevelLessonsView({ roomId }: LevelLessonsViewProps) {
                       <h3 className="news-card__title" title={lesson.name}>{lesson.name}</h3>
 
                       <div className="news-card__footer">
+                        {(() => {
+                          const isDone = Boolean(lesson.isCompleted);
+                          const coins = isDone ? (lesson.replayCoins ?? 0) : (lesson.firstPlayCoins ?? 1);
+                          return (
+                            <div
+                              className="news-card__coin-badge"
+                              title={
+                                isDone
+                                  ? `Đã hoàn thành! Chơi lại nhận: +${coins} xu`
+                                  : `Chưa làm. Hoàn thành lần đầu nhận: +${coins} xu`
+                              }
+                            >
+                              <span style={{ fontSize: 12 }}>🪙</span>
+                              <span>+{coins} xu</span>
+                            </div>
+                          );
+                        })()}
+
                         <button
                           type="button"
                           className={`news-card__heart-btn ${isLiked ? "news-card__heart-btn--active" : ""}`}

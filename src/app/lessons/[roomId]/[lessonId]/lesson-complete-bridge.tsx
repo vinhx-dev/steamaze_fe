@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEquipStore } from "@/stores/equip-store";
 import { api } from "@/lib/api/client";
 import { useAuth } from "@/modules/auth";
@@ -31,8 +32,16 @@ interface LessonCompleteBridgeProps {
 }
 
 type Completion =
-  | { state: "done"; rewards: number[]; coinsEarned: number; totalCoins?: number; score: number }
-  | { state: "already"; coinsEarned: number; score: number }
+  | {
+      state: "done";
+      rewards: number[];
+      coinsEarned: number;
+      totalCoins?: number;
+      score: number;
+      isFirstCompletion?: boolean;
+      message?: string;
+    }
+  | { state: "already"; coinsEarned: number; score: number; message?: string }
   | { state: "failed_score"; score: number; requiredScore: number }
   | { state: "failed"; text: string; score?: number };
 
@@ -180,6 +189,7 @@ function LessonCompleteBridge({
   }, [activeEquipped, catalogData]);
 
   const { updateCoins } = useAuth();
+  const queryClient = useQueryClient();
 
   const handleReplay = useCallback(() => {
     sentRef.current = false;
@@ -202,7 +212,9 @@ function LessonCompleteBridge({
           data: {
             rewards: number[];
             coinsEarned?: number;
+            isFirstCompletion?: boolean;
             alreadyRewarded?: boolean;
+            completionCount?: number;
             userCoins?: number;
             message?: string;
           };
@@ -213,21 +225,18 @@ function LessonCompleteBridge({
           updateCoins(data.userCoins);
         }
 
-        if (data.coinsEarned && data.coinsEarned > 0) {
-          setCompletion({
-            state: "done",
-            rewards: data.rewards ?? [],
-            coinsEarned: data.coinsEarned,
-            totalCoins: data.userCoins,
-            score: achievedScore,
-          });
-        } else {
-          setCompletion({
-            state: "already",
-            coinsEarned: 0,
-            score: achievedScore,
-          });
-        }
+        // Cập nhật lại cache danh sách bài học để hiển thị đúng số xu chơi lại
+        void queryClient.invalidateQueries({ queryKey: ["room-lessons"] });
+
+        setCompletion({
+          state: "done",
+          rewards: data.rewards ?? [],
+          coinsEarned: data.coinsEarned ?? 0,
+          totalCoins: data.userCoins,
+          score: achievedScore,
+          isFirstCompletion: data.isFirstCompletion,
+          message: data.message,
+        });
       } catch (err) {
         const status = (err as { response?: { status?: number } })?.response?.status;
 
@@ -426,21 +435,25 @@ function LessonCompleteBridge({
                 <p>
                   {completion.coinsEarned > 0 ? (
                     <>
-                      🎉 Chúc mừng bạn đã hoàn thành bài học! Nhận được{" "}
-                      <span className="lesson-result-card__coin-highlight">
-                        +{completion.coinsEarned} Xu
-                      </span>{" "}
-                      vào tài khoản.
+                      🎉 {completion.message || (
+                        <>
+                          Chúc mừng bạn đã {completion.isFirstCompletion ? "hoàn thành" : "hoàn thành lại"} bài học! Nhận được{" "}
+                          <span className="lesson-result-card__coin-highlight">
+                            +{completion.coinsEarned} Xu
+                          </span>{" "}
+                          vào tài khoản.
+                        </>
+                      )}
                     </>
                   ) : (
-                    <>Chúc mừng bạn đã hoàn thành xuất sắc bài học!</>
+                    <>{completion.message || "Chúc mừng bạn đã hoàn thành bài học!"}</>
                   )}
                 </p>
               )}
 
               {completion.state === "already" && (
                 <p>
-                  Bạn đã hoàn thành bài học này trước đó! (Xu thưởng của bài học mỗi tài khoản chỉ nhận 1 lần duy nhất).
+                  {completion.message || "Bạn đã hoàn thành bài học này trước đó!"}
                 </p>
               )}
 

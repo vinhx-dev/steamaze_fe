@@ -123,6 +123,8 @@ export function AdminLessonsPanel() {
       order: lessons.length + 1,
       published: true,
       comingSoon: false,
+      firstPlayCoins: 1,
+      replayCoins: 0,
       html: "<!doctype html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <title>Bài học</title>\n</head>\n<body>\n  <h1>Nội dung bài học mới</h1>\n</body>\n</html>",
     });
     setIsModalOpen(true);
@@ -140,6 +142,8 @@ export function AdminLessonsPanel() {
         order: lesson.order,
         published: detail.published ?? true,
         comingSoon: Boolean(detail.comingSoon),
+        firstPlayCoins: detail.firstPlayCoins ?? lesson.firstPlayCoins ?? 1,
+        replayCoins: detail.replayCoins ?? lesson.replayCoins ?? 0,
         html: detail.html || "",
       });
       setIsModalOpen(true);
@@ -186,6 +190,8 @@ export function AdminLessonsPanel() {
         imageUrl: finalImageUrl,
         published: values.published !== false,
         comingSoon: Boolean(values.comingSoon),
+        firstPlayCoins: values.firstPlayCoins !== undefined ? Number(values.firstPlayCoins) : 1,
+        replayCoins: values.replayCoins !== undefined ? Number(values.replayCoins) : 0,
       };
 
       if (editingLesson) {
@@ -281,8 +287,23 @@ export function AdminLessonsPanel() {
       title: "Thứ tự",
       dataIndex: "order",
       key: "order",
-      width: 100,
+      width: 90,
       render: (order: number) => <span>#{order}</span>,
+    },
+    {
+      title: "Xu thưởng",
+      key: "coins",
+      width: 140,
+      render: (_, record: Lesson) => (
+        <Space direction="vertical" size={2}>
+          <span style={{ fontSize: 13 }}>
+            Lần đầu: <Tag color="gold" style={{ fontWeight: 600 }}>+{record.firstPlayCoins ?? 1}</Tag>
+          </span>
+          <span style={{ fontSize: 13 }}>
+            Chơi lại: <Tag color="blue" style={{ fontWeight: 600 }}>+{record.replayCoins ?? 0}</Tag>
+          </span>
+        </Space>
+      ),
     },
     {
       title: "Trạng thái",
@@ -436,6 +457,48 @@ export function AdminLessonsPanel() {
             </Form.Item>
           </div>
 
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <Form.Item
+              name="firstPlayCoins"
+              label="Xu lần đầu"
+              tooltip="Số xu thưởng cho người chơi khi hoàn thành bài học lần đầu tiên (mặc định: 1)."
+              rules={[
+                { required: true, message: "Vui lòng nhập số xu lần đầu" },
+                {
+                  validator: (_, value) => {
+                    if (value === undefined || value === null) return Promise.resolve();
+                    if (!Number.isInteger(Number(value)) || Number(value) < 0) {
+                      return Promise.reject(new Error("Số xu lần đầu phải là số nguyên từ 0 trở lên"));
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+            >
+              <InputNumber min={0} step={1} precision={0} style={{ width: "100%" }} placeholder="1" />
+            </Form.Item>
+
+            <Form.Item
+              name="replayCoins"
+              label="Xu chơi lại"
+              tooltip="Số xu thưởng mỗi khi người chơi hoàn thành lại bài học này (mặc định: 0)."
+              rules={[
+                { required: true, message: "Vui lòng nhập số xu chơi lại" },
+                {
+                  validator: (_, value) => {
+                    if (value === undefined || value === null) return Promise.resolve();
+                    if (!Number.isInteger(Number(value)) || Number(value) < 0) {
+                      return Promise.reject(new Error("Số xu chơi lại phải là số nguyên từ 0 trở lên"));
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+            >
+              <InputNumber min={0} step={1} precision={0} style={{ width: "100%" }} placeholder="0" />
+            </Form.Item>
+          </div>
+
           {/* VÙNG THÊM ẢNH BÀI HỌC LƯU BASE64 */}
           <Form.Item label="Hình ảnh bài học" extra={`Ảnh tự động được nén trước khi lưu, tối đa ${MAX_UPLOAD_IMAGE_LABEL} sau khi nén`}>
             <input
@@ -550,6 +613,9 @@ export function AdminLessonsPanel() {
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a" }}>{viewingLesson.name}</div>
                 <div style={{ fontSize: 13, color: "#64748b", marginTop: 4 }}>Thứ tự hiển thị: <strong>{viewingLesson.order}</strong></div>
+                <div style={{ fontSize: 13, color: "#64748b", marginTop: 2 }}>
+                  Xu thưởng: <strong>+{viewingLesson.firstPlayCoins ?? 1} xu</strong> (lần đầu) / <strong>+{viewingLesson.replayCoins ?? 0} xu</strong> (chơi lại)
+                </div>
                 {viewingLesson.slug && (
                   <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 2 }}>Đường dẫn: /{viewingLesson.slug}</div>
                 )}
