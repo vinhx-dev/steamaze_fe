@@ -8,7 +8,7 @@ import Link from "next/link";
 import { getLessons, getRoom, preloadAndCacheGame } from "@/modules/lessons";
 import { useInventory, useItemPreload } from "@/modules/inventory";
 import { warmUpFaceModel } from "@/modules/inventory/hooks/useHeadTracking";
-import { EmptyState, ErrorState, GameCardSkeleton } from "@/components/ui";
+import { CoinIcon, EmptyState, ErrorState, GameCardSkeleton } from "@/components/ui";
 import { toast } from "@/components/ui/game-toast";
 import { useAuth } from "@/modules/auth";
 import "./level-lessons.scss";
@@ -239,7 +239,9 @@ export function LevelLessonsView({ roomId }: LevelLessonsViewProps) {
                                   : `Chưa làm. Hoàn thành lần đầu nhận: +${coins} xu`
                               }
                             >
-                              <span style={{ fontSize: 12 }}>🪙</span>
+                              <span className="news-card__coin-icon" aria-hidden="true">
+                                <CoinIcon size="100%" />
+                              </span>
                               <span>+{coins} xu</span>
                             </div>
                           );
