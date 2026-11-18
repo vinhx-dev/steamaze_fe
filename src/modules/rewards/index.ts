@@ -1,4 +1,5 @@
 export { DailyRewardModal } from "./components/daily-reward-modal/daily-reward-modal";
+export { ReferralModal } from "./components/referral-modal/referral-modal";
 export {
   getDailyRewardStatus,
   claimDailyReward,

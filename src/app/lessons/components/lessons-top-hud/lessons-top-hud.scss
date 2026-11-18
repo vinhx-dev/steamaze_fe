@@ -661,3 +661,64 @@ $font-game: var(--font-game, "Baloo 2"), "Baloo 2", cursive, system-ui, sans-ser
     }
   }
 }
+
+// Nút mã giới thiệu: dùng chung khung với box chuỗi, chỉ thay lửa bằng icon chia sẻ
+.lessons-top-hud {
+  &__referral {
+    justify-content: center;
+    padding-inline: 12px;
+    cursor: pointer;
+    transition: transform 0.12s ease, filter 0.12s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+
+  &__referral-icon {
+    font-size: 18px;
+    color: #ffb340;
+    filter: drop-shadow(0 0 3px rgba(255, 138, 31, 0.7));
+  }
+}
+
+@media (max-width: 640px) {
+  .lessons-top-hud {
+    &__referral {
+      padding-inline: 8px;
+    }
+
+    &__referral-icon {
+      font-size: 14px;
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  .lessons-top-hud {
+    &__referral {
+      padding-inline: 15px;
+    }
+
+    &__referral-icon {
+      font-size: 22px;
+    }
+  }
+}
+
+@media (min-width: 1440px) {
+  .lessons-top-hud {
+    &__referral {
+      padding-inline: 17px;
+    }
+
+    &__referral-icon {
+      font-size: 24px;
+    }
+  }
+}

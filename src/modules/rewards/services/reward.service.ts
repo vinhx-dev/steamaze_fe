@@ -4,8 +4,22 @@ import type {
   ClaimDailyRewardResult,
   DailyRewardConfig,
   DailyRewardStatus,
+  RedeemReferralResult,
+  ReferralInfo,
   UsersCoinsResponse,
 } from "../types";
+
+// Lấy mã giới thiệu của user hiện tại
+async function getReferralInfo(): Promise<ReferralInfo> {
+  const res = await api.get<ApiResponse<ReferralInfo>>("/referrals/me");
+  return res.data.data;
+}
+
+// Nhập mã giới thiệu của người khác để nhận xu
+async function redeemReferralCode(code: string): Promise<RedeemReferralResult> {
+  const res = await api.post<ApiResponse<RedeemReferralResult>>("/referrals/redeem", { code });
+  return res.data.data;
+}
 
 // Lấy trạng thái điểm danh nhận xu của user hiện tại
 async function getDailyRewardStatus(): Promise<DailyRewardStatus> {
@@ -70,6 +84,8 @@ async function adjustUserCoins(payload: {
 }
 
 export {
+  getReferralInfo,
+  redeemReferralCode,
   getDailyRewardStatus,
   claimDailyReward,
   getDailyRewardConfig,

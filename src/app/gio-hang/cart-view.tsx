@@ -10,12 +10,35 @@ import {
   getShopItems,
   getMyOrders,
   purchaseShopItem,
+  CONTACT_FIELD_MAX_LENGTH,
+  EMPTY_CONTACT_FORM,
+  formatContactInfo,
+  serializeContactInfo,
+  validateContactForm,
+  type ContactForm,
+  type ContactFormErrors,
   type ShopItem,
 } from "@/modules/shop";
 import { toast } from "@/components/ui/game-toast";
 import { CoinIcon } from "@/components/ui/coin-icon";
 import { EmptyState, ErrorState, GameCardSkeleton } from "@/components/ui";
 import "./cart.scss";
+
+const CONTACT_FIELDS: {
+  name: keyof ContactForm;
+  label: string;
+  placeholder: string;
+  autoComplete: string;
+}[] = [
+  { name: "phone", label: "Số điện thoại", placeholder: "VD: 0912345678", autoComplete: "tel" },
+  {
+    name: "address",
+    label: "Địa chỉ (ghi rõ số nhà, đường, phường/xã, tỉnh/thành phố)",
+    placeholder: "VD: 12 Nguyễn Trãi, phường Bến Thành, TP. Hồ Chí Minh",
+    autoComplete: "street-address",
+  },
+  { name: "recipientName", label: "Tên người nhận", placeholder: "Nhập họ và tên người nhận", autoComplete: "name" },
+];
 
 export function CartView() {
   const router = useRouter();
@@ -40,10 +63,10 @@ export function CartView() {
 
   // Mua hàng modal
   const [selectedItem, setSelectedItem] = useState<ShopItem | null>(null);
-  const [contactInfo, setContactInfo] = useState("");
+  const [contactForm, setContactForm] = useState<ContactForm>(EMPTY_CONTACT_FORM);
   const [note, setNote] = useState("");
   const [isPurchasing, setIsPurchasing] = useState(false);
-  const [contactError, setContactError] = useState("");
+  const [contactErrors, setContactErrors] = useState<ContactFormErrors>({});
 
   const coins = user?.coins ?? 0;
 
@@ -80,34 +103,42 @@ export function CartView() {
     }
 
     setSelectedItem(item);
-    setContactInfo("");
+    setContactForm(EMPTY_CONTACT_FORM);
     setNote("");
-    setContactError("");
+    setContactErrors({});
   };
 
   const handleCloseBuyModal = () => {
     if (isPurchasing) return;
     setSelectedItem(null);
-    setContactInfo("");
+    setContactForm(EMPTY_CONTACT_FORM);
     setNote("");
-    setContactError("");
+    setContactErrors({});
+  };
+
+  const handleContactChange = (field: keyof ContactForm, value: string) => {
+    setContactForm((prev) => ({ ...prev, [field]: value }));
+    setContactErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
   const handleConfirmPurchase = async () => {
     if (!selectedItem || !user) return;
 
-    if (selectedItem.isSpecial && !contactInfo.trim()) {
-      setContactError("Vui lòng nhập thông tin liên lạc (SĐT, Zalo, Email, Facebook hoặc Địa chỉ)");
-      return;
+    if (selectedItem.isSpecial) {
+      const errors = validateContactForm(contactForm);
+      if (Object.keys(errors).length > 0) {
+        setContactErrors(errors);
+        return;
+      }
     }
 
     setIsPurchasing(true);
-    setContactError("");
+    setContactErrors({});
 
     try {
       const res = await purchaseShopItem({
         itemId: selectedItem.id,
-        contactInfo: selectedItem.isSpecial ? contactInfo.trim() : undefined,
+        contactInfo: selectedItem.isSpecial ? serializeContactInfo(contactForm) : undefined,
         note: selectedItem.isSpecial ? note.trim() : undefined,
       });
 
@@ -390,28 +421,52 @@ export function CartView() {
             ) : null}
 
             {/* Form nhập thông tin liên lạc (BẮT BUỘC ĐỐI VỚI ĐỒ ĐẶC BIỆT) */}
-            {selectedItem.isSpecial && (
-              <div className="cart-modal-board__input-group">
-                <label className="cart-modal-board__label" htmlFor="cartContactInput">
-                  Thông tin liên lạc của bạn <span style={{ color: "#d0152c" }}>*</span>
-                </label>
-                <input
-                  id="cartContactInput"
-                  type="text"
-                  className="cart-modal-board__input"
-                  placeholder="Nhập SĐT, Zalo, Email, Facebook hoặc Địa chỉ nhận quà..."
-                  value={contactInfo}
-                  onChange={(e) => setContactInfo(e.target.value)}
-                  disabled={isPurchasing}
-                  autoFocus
-                />
-                {contactError && (
-                  <span style={{ fontSize: "12.5px", color: "#b91c1c", fontWeight: 700 }}>
-                    ⚠️ {contactError}
-                  </span>
-                )}
-              </div>
-            )}
+            {selectedItem.isSpecial &&
+              CONTACT_FIELDS.map((field, index) => {
+                const inputId = `cartContact-${field.name}`;
+                const errorId = `${inputId}-error`;
+                const error = contactErrors[field.name];
+                const inputProps = {
+                  id: inputId,
+                  className: "cart-modal-board__input",
+                  placeholder: field.placeholder,
+                  autoComplete: field.autoComplete,
+                  maxLength: CONTACT_FIELD_MAX_LENGTH[field.name],
+                  value: contactForm[field.name],
+                  disabled: isPurchasing,
+                  autoFocus: index === 0,
+                  "aria-required": true,
+                  "aria-invalid": Boolean(error),
+                  "aria-describedby": error ? errorId : undefined,
+                };
+
+                return (
+                  <div key={field.name} className="cart-modal-board__input-group">
+                    <label className="cart-modal-board__label" htmlFor={inputId}>
+                      {field.label} <span style={{ color: "#d0152c" }}>*</span>
+                    </label>
+                    {field.name === "address" ? (
+                      <textarea
+                        {...inputProps}
+                        rows={2}
+                        style={{ resize: "none" }}
+                        onChange={(e) => handleContactChange(field.name, e.target.value)}
+                      />
+                    ) : (
+                      <input
+                        {...inputProps}
+                        type={field.name === "phone" ? "tel" : "text"}
+                        onChange={(e) => handleContactChange(field.name, e.target.value)}
+                      />
+                    )}
+                    {error && (
+                      <span id={errorId} style={{ fontSize: "12.5px", color: "#b91c1c", fontWeight: 700 }}>
+                        ⚠️ {error}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
 
             {/* Ghi chú thêm (tùy chọn) - CHỈ DÀNH CHO VẬT PHẨM ĐẶC BIỆT */}
             {selectedItem.isSpecial && (
@@ -524,8 +579,8 @@ export function CartView() {
                             Thời gian: {new Date(ord.createdAt).toLocaleString("vi-VN")}
                           </p>
                           {ord.contactInfo && (
-                            <p className="cart-order-card__contact">
-                              📞 Liên lạc: {ord.contactInfo}
+                            <p className="cart-order-card__contact" style={{ whiteSpace: "pre-line" }}>
+                              {formatContactInfo(ord.contactInfo)}
                             </p>
                           )}
                         </div>

@@ -1,0 +1,109 @@
+// Modal mã giới thiệu: dùng lại khung và nút của modal nhận xu
+$font-game: var(--font-game, "Baloo 2"), "Baloo 2", cursive, system-ui, sans-serif;
+$brown-dark: #3b2214;
+$brown-light: #caa082;
+
+.daily-reward-modal.referral-modal {
+  @media (min-width: 481px) {
+    max-width: 440px;
+  }
+}
+
+.referral-modal {
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    &--divided {
+      padding-top: 10px;
+      border-top: 1.5px solid rgba(59, 34, 20, 0.15);
+    }
+  }
+
+  &__label {
+    display: block;
+    margin-bottom: 6px;
+    color: #6a4733;
+    font-family: $font-game;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  &__section > &__label {
+    margin-bottom: 0;
+  }
+
+  &__row {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+    padding: 0 10px;
+    border: 1.5px solid $brown-dark;
+    border-radius: 8px;
+    outline: none;
+    background: #fffaf3;
+    box-shadow: inset 0 2px 0 rgba(202, 160, 130, 0.35);
+    color: $brown-dark;
+    font-family: $font-game;
+    font-size: 16px; // Từ 16px trở lên để iOS không tự phóng to khi nhập
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: #9e8371;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    &:focus {
+      border-color: #f5a800;
+      box-shadow: 0 0 0 2px rgba(245, 168, 0, 0.3);
+    }
+
+    &--code {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.55);
+      border-style: dashed;
+      border-color: $brown-light;
+      box-shadow: none;
+    }
+  }
+
+  // Nút cao bằng ô nhập, thắng padding theo màn hình của nút gốc
+  &__row &__btn {
+    flex-shrink: 0;
+    min-width: 96px;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  &__hint {
+    margin: 0;
+    color: #a30f22;
+    font-family: $font-game;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  &__done {
+    margin: 0;
+    padding: 9px 10px;
+    border: 1px dashed #8d6046;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.4);
+    color: #4a5a2c;
+    font-family: $font-game;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+  }
+}

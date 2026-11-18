@@ -4,9 +4,9 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { GiftOutlined } from "@ant-design/icons";
+import { GiftOutlined, ShareAltOutlined } from "@ant-design/icons";
 import { useAuth } from "@/modules/auth";
-import { DailyRewardModal } from "@/modules/rewards";
+import { DailyRewardModal, ReferralModal } from "@/modules/rewards";
 import "./lessons-top-hud.scss";
 
 
@@ -95,6 +95,7 @@ export function LessonsTopHud() {
   }, [isDropdownOpen, closeDropdown]);
 
   const [isDailyRewardOpen, setIsDailyRewardOpen] = useState(false);
+  const [isReferralOpen, setIsReferralOpen] = useState(false);
   const autoCheckedRef = useRef(false);
 
   // Lần đầu vào trang trong ngày: tự động hiện bảng nhận xu nếu chưa tắt
@@ -157,6 +158,20 @@ export function LessonsTopHud() {
             <StreakFlame />
             <span className="lessons-top-hud__streak-value">{streak.days}</span>
           </div>
+        )}
+
+        {/* Mã giới thiệu, cùng kiểu với box chuỗi */}
+        {user && (
+          <button
+            type="button"
+            className="lessons-top-hud__streak lessons-top-hud__referral"
+            onClick={() => setIsReferralOpen(true)}
+            aria-haspopup="dialog"
+            aria-label="Mã giới thiệu"
+            title="Mã giới thiệu"
+          >
+            <ShareAltOutlined className="lessons-top-hud__referral-icon" />
+          </button>
         )}
 
         {/* Avatar + tên và Dropdown tài khoản */}
@@ -344,6 +359,8 @@ export function LessonsTopHud() {
       isOpen={isDailyRewardOpen}
       onClose={() => setIsDailyRewardOpen(false)}
     />
+
+    {isReferralOpen && <ReferralModal onClose={() => setIsReferralOpen(false)} />}
   </>
   );
 }

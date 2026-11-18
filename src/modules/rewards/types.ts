@@ -43,7 +43,23 @@ interface UsersCoinsResponse {
   users: UserCoinItem[];
 }
 
+interface ReferralInfo {
+  code: string;
+  rewardCoins: number;
+  hasRedeemed: boolean;
+  referredByUsername: string | null;
+}
+
+interface RedeemReferralResult {
+  coinsEarned: number;
+  userCoins: number;
+  referredByUsername: string;
+  message: string;
+}
+
 export type {
+  ReferralInfo,
+  RedeemReferralResult,
   DailyRewardStatus,
   ClaimDailyRewardResult,
   DailyRewardConfig,

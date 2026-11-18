@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { User, UserGroupInfo } from "@/modules/auth/types";
-import { getMyOrders, type ShopOrder } from "@/modules/shop";
+import { formatContactInfo, getMyOrders, type ShopOrder } from "@/modules/shop";
 import { getMyGroup } from "@/modules/friends";
 import { useAuth } from "@/modules/auth";
 import { getInventory, useCatalog } from "@/modules/inventory";
@@ -338,8 +338,8 @@ export function ProfileView({ initialUser, user: propUser }: ProfileViewProps) {
                               Ngày mua: {new Date(ord.createdAt).toLocaleString("vi-VN")}
                             </span>
                             {ord.contactInfo && (
-                              <span className="profile-order-card__contact">
-                                📞 Thông tin liên lạc: {ord.contactInfo}
+                              <span className="profile-order-card__contact" style={{ whiteSpace: "pre-line" }}>
+                                {formatContactInfo(ord.contactInfo)}
                               </span>
                             )}
                             {ord.note && (

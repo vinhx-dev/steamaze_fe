@@ -42,6 +42,7 @@ import { CoinIcon } from "@/components/ui/coin-icon";
 import {
   createShopItem,
   deleteShopItem,
+  formatContactInfo,
   getAdminOrders,
   getAvailableShopAssets,
   getShopItems,
@@ -550,8 +551,8 @@ export function AdminShopPanel() {
       render: (contact: string | null) =>
         contact ? (
           <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", padding: "4px 8px", borderRadius: 4 }}>
-            <Text copyable style={{ fontSize: 13, fontWeight: 600 }}>
-              {contact}
+            <Text copyable style={{ fontSize: 13, fontWeight: 600, whiteSpace: "pre-line" }}>
+              {formatContactInfo(contact)}
             </Text>
           </div>
         ) : (
