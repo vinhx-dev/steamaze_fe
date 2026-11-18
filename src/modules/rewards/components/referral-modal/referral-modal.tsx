@@ -130,7 +130,7 @@ export function ReferralModal({ onClose }: ReferralModalProps) {
           <>
             <section className="referral-modal__section">
               <label className="referral-modal__label" htmlFor="referral-my-code">
-                Mã của bạn
+                Mã của bạn (bạn bè nhập mã này, cả hai cùng nhận {referral.rewardCoins} xu)
               </label>
               <div className="referral-modal__row">
                 <input
